@@ -14,8 +14,10 @@ from services.tools.preflight import preflight
 @mcp_for_unity_tool(
     description=(
         "Performs CRUD operations on Unity scenes. "
-        "Read-only actions: get_hierarchy, get_active, get_build_settings, scene_view_frame. "
-        "Modifying actions: create, load, save. "
+        "Read-only actions: get_hierarchy, get_active, get_build_settings, scene_view_frame, list_subscenes. "
+        "Modifying actions: create, load, save, open_subscene, close_subscene. "
+        "SubScene actions (require com.unity.entities): list_subscenes (find all SubScenes), "
+        "open_subscene (open for editing in edit mode), close_subscene (close editing). "
         "For screenshots, use manage_camera (screenshot, screenshot_multiview actions)."
     ),
     annotations=ToolAnnotations(
@@ -33,6 +35,9 @@ async def manage_scene(
         "get_active",
         "get_build_settings",
         "scene_view_frame",
+        "list_subscenes",
+        "open_subscene",
+        "close_subscene",
     ], "Perform CRUD operations on Unity scenes and control the Scene View camera."],
     name: Annotated[str, "Scene name."] | None = None,
     path: Annotated[str, "Scene path."] | None = None,
@@ -56,6 +61,9 @@ async def manage_scene(
                                      "Child paging hint (safety)."] | None = None,
     include_transform: Annotated[bool | str,
                                  "If true, include local transform in node summaries."] | None = None,
+    # --- SubScene params ---
+    scene_name: Annotated[str,
+                          "SubScene name or GameObject name (for open_subscene/close_subscene)."] | None = None,
 ) -> dict[str, Any]:
     unity_instance = await get_unity_instance_from_context(ctx)
     gate = await preflight(ctx, wait_for_no_compile=True, refresh_if_dirty=True)
@@ -99,6 +107,10 @@ async def manage_scene(
             params["maxChildrenPerNode"] = coerced_max_children_per_node
         if coerced_include_transform is not None:
             params["includeTransform"] = coerced_include_transform
+
+        # SubScene params
+        if scene_name is not None:
+            params["sceneName"] = scene_name
 
         # Use centralized retry helper with instance routing
         response = await send_with_unity_instance(async_send_command_with_retry, unity_instance, "manage_scene", params)

@@ -9,6 +9,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if UNITY_ENTITIES
+using Unity.Scenes;
+#endif
 
 namespace MCPForUnity.Editor.Tools
 {
@@ -53,6 +56,9 @@ namespace MCPForUnity.Editor.Tools
             public int? maxDepth { get; set; }
             public int? maxChildrenPerNode { get; set; }
             public bool? includeTransform { get; set; }
+
+            // SubScene actions
+            public string sceneName { get; set; }
         }
 
         private static float[] ParseFloatArray(JToken token)
@@ -119,6 +125,9 @@ namespace MCPForUnity.Editor.Tools
                 maxDepth = ParamCoercion.CoerceIntNullable(p["maxDepth"] ?? p["max_depth"]),
                 maxChildrenPerNode = ParamCoercion.CoerceIntNullable(p["maxChildrenPerNode"] ?? p["max_children_per_node"]),
                 includeTransform = ParamCoercion.CoerceBoolNullable(p["includeTransform"] ?? p["include_transform"]),
+
+                // SubScene actions
+                sceneName = (p["sceneName"] ?? p["scene_name"])?.ToString(),
             };
         }
 
@@ -222,9 +231,15 @@ namespace MCPForUnity.Editor.Tools
                     return CaptureScreenshot(cmd);
                 case "scene_view_frame":
                     return FrameSceneView(cmd);
+                case "list_subscenes":
+                    return ListSubScenes();
+                case "open_subscene":
+                    return OpenSubScene(cmd);
+                case "close_subscene":
+                    return CloseSubScene(cmd);
                 default:
                     return new ErrorResponse(
-                        $"Unknown action: '{action}'. Valid actions: create, load, save, get_hierarchy, get_active, get_build_settings, screenshot, scene_view_frame."
+                        $"Unknown action: '{action}'. Valid actions: create, load, save, get_hierarchy, get_active, get_build_settings, screenshot, scene_view_frame, list_subscenes, open_subscene, close_subscene."
                     );
             }
         }
@@ -1328,6 +1343,22 @@ namespace MCPForUnity.Editor.Tools
                 {
                     try { McpLog.Info("[ManageScene] get_hierarchy: listing root objects (paged summary)", always: false); } catch { }
                     nodes = activeScene.GetRootGameObjects().Where(go => go != null).ToList();
+
+#if UNITY_ENTITIES
+                    // Also include root objects from open SubScenes
+                    var subscenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
+                    foreach (var sub in subscenes)
+                    {
+                        if (sub == null || !sub.IsLoaded) continue;
+                        var editingScene = sub.EditingScene;
+                        if (!editingScene.IsValid() || !editingScene.isLoaded) continue;
+                        var subRoots = editingScene.GetRootGameObjects();
+                        foreach (var sr in subRoots)
+                        {
+                            if (sr != null) nodes.Add(sr);
+                        }
+                    }
+#endif
                     scope = "roots";
                 }
                 else
@@ -1435,6 +1466,32 @@ namespace MCPForUnity.Editor.Tools
             }
             catch { }
 
+#if UNITY_ENTITIES
+            // Search inside open SubScenes
+            try
+            {
+                var subscenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
+                foreach (var sub in subscenes)
+                {
+                    if (sub == null || !sub.IsLoaded) continue;
+                    var editingScene = sub.EditingScene;
+                    if (!editingScene.IsValid() || !editingScene.isLoaded) continue;
+
+                    foreach (var root in editingScene.GetRootGameObjects())
+                    {
+                        if (root == null) continue;
+                        if (root.name == s) return root;
+                        var trs = root.GetComponentsInChildren<Transform>(includeInactive: true);
+                        foreach (var t in trs)
+                        {
+                            if (t != null && t.gameObject != null && t.gameObject.name == s) return t.gameObject;
+                        }
+                    }
+                }
+            }
+            catch { }
+#endif
+
             return null;
         }
 
@@ -1517,6 +1574,153 @@ namespace MCPForUnity.Editor.Tools
                 return go.name;
             }
         }
+
+        #region SubScene Actions
+
+        private static object ListSubScenes()
+        {
+#if UNITY_ENTITIES
+            try
+            {
+                var subscenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
+                var results = new List<object>();
+
+                foreach (var sub in subscenes)
+                {
+                    if (sub == null) continue;
+
+                    var data = new Dictionary<string, object>
+                    {
+                        ["name"] = sub.SceneName,
+                        ["game_object"] = sub.gameObject.name,
+                        ["instanceID"] = sub.gameObject.GetInstanceID(),
+                        ["is_loaded"] = sub.IsLoaded,
+                        ["auto_load"] = sub.AutoLoadScene,
+                    };
+
+                    if (sub.SceneAsset != null)
+                    {
+                        data["scene_asset_path"] = AssetDatabase.GetAssetPath(sub.SceneAsset);
+                    }
+
+                    if (sub.IsLoaded)
+                    {
+                        var editingScene = sub.EditingScene;
+                        if (editingScene.IsValid() && editingScene.isLoaded)
+                        {
+                            data["root_count"] = editingScene.rootCount;
+                        }
+                    }
+
+                    results.Add(data);
+                }
+
+                return new SuccessResponse(
+                    $"Found {results.Count} SubScene(s).",
+                    new Dictionary<string, object>
+                    {
+                        ["count"] = results.Count,
+                        ["subscenes"] = results
+                    });
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse($"Error listing SubScenes: {e.Message}");
+            }
+#else
+            return new ErrorResponse("SubScene support requires com.unity.entities package.");
+#endif
+        }
+
+        private static object OpenSubScene(SceneCommand cmd)
+        {
+#if UNITY_ENTITIES
+            try
+            {
+                string sceneName = cmd.sceneName;
+                if (string.IsNullOrEmpty(sceneName))
+                    return new ErrorResponse("'scene_name' parameter is required for open_subscene.");
+
+                var sub = FindSubSceneByName(sceneName);
+                if (sub == null)
+                    return new ErrorResponse($"SubScene '{sceneName}' not found.");
+
+                if (sub.IsLoaded)
+                    return new SuccessResponse($"SubScene '{sceneName}' is already open.");
+
+                // Open the SubScene for editing
+                SubScene.SetOpenForEdit(new[] { sub }, true);
+
+                return new SuccessResponse(
+                    $"Opened SubScene '{sceneName}' for editing.",
+                    new Dictionary<string, object>
+                    {
+                        ["scene_name"] = sub.SceneName,
+                        ["game_object"] = sub.gameObject.name,
+                    });
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse($"Error opening SubScene: {e.Message}");
+            }
+#else
+            return new ErrorResponse("SubScene support requires com.unity.entities package.");
+#endif
+        }
+
+        private static object CloseSubScene(SceneCommand cmd)
+        {
+#if UNITY_ENTITIES
+            try
+            {
+                string sceneName = cmd.sceneName;
+                if (string.IsNullOrEmpty(sceneName))
+                    return new ErrorResponse("'scene_name' parameter is required for close_subscene.");
+
+                var sub = FindSubSceneByName(sceneName);
+                if (sub == null)
+                    return new ErrorResponse($"SubScene '{sceneName}' not found.");
+
+                if (!sub.IsLoaded)
+                    return new SuccessResponse($"SubScene '{sceneName}' is already closed.");
+
+                SubScene.SetOpenForEdit(new[] { sub }, false);
+
+                return new SuccessResponse(
+                    $"Closed SubScene '{sceneName}'.",
+                    new Dictionary<string, object>
+                    {
+                        ["scene_name"] = sub.SceneName,
+                        ["game_object"] = sub.gameObject.name,
+                    });
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse($"Error closing SubScene: {e.Message}");
+            }
+#else
+            return new ErrorResponse("SubScene support requires com.unity.entities package.");
+#endif
+        }
+
+#if UNITY_ENTITIES
+        private static SubScene FindSubSceneByName(string name)
+        {
+            var subscenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
+            foreach (var sub in subscenes)
+            {
+                if (sub == null) continue;
+                if (string.Equals(sub.SceneName, name, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(sub.gameObject.name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return sub;
+                }
+            }
+            return null;
+        }
+#endif
+
+        #endregion
 
     }
 }

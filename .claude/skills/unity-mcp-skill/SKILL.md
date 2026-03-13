@@ -155,7 +155,7 @@ uri="file:///full/path/to/file.cs"
 
 | Category | Key Tools | Use For |
 |----------|-----------|---------|
-| **Scene** | `manage_scene`, `find_gameobjects` | Scene operations, finding objects |
+| **Scene** | `manage_scene`, `find_gameobjects` | Scene operations, finding objects, SubScene management (list/open/close, requires `com.unity.entities`) |
 | **Objects** | `manage_gameobject`, `manage_components` | Creating/modifying GameObjects |
 | **Scripts** | `create_script`, `script_apply_edits`, `refresh_unity` | C# code management |
 | **Assets** | `manage_asset`, `manage_prefabs` | Asset operations |

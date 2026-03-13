@@ -13,6 +13,7 @@ Common workflows and patterns for effective Unity-MCP usage.
 - [UI Creation Workflows](#ui-creation-workflows)
 - [Camera & Cinemachine Workflows](#camera--cinemachine-workflows)
 - [ProBuilder Workflows](#probuilder-workflows)
+- [SubScene Workflows](#subscene-workflows)
 - [Batch Operations](#batch-operations)
 
 ---
@@ -1609,6 +1610,94 @@ manage_probuilder(action="delete_faces", target="Obj", properties={"faceIndices"
 - **`set_pivot`**: Broken -- vertex positions don't persist through mesh rebuild. Use `center_pivot` or Transform positioning.
 - **`convert_to_probuilder`**: Broken -- MeshImporter throws. Create shapes natively with `create_shape`/`create_poly_shape`.
 - **`subdivide`**: Uses `ConnectElements.Connect` (not traditional quad subdivision). Connects face midpoints.
+
+---
+
+## SubScene Workflows
+
+> **Requires:** `com.unity.entities` package. All SubScene operations work in **Edit mode** only.
+
+SubScenes (part of Unity DOTS/Entities) are containers that serialize GameObjects into an optimized binary format. Objects inside SubScenes are invisible to normal scene queries until the SubScene is opened for editing. These workflows show how to discover, open, browse, and modify SubScene contents.
+
+### Discover SubScenes
+
+```python
+# List all SubScenes in the current scene with open/closed status
+result = manage_scene(action="list_subscenes")
+# Returns: name, gameObjectName, scenePath, isLoaded (open for editing), isValid
+```
+
+### Open and Browse SubScene Contents
+
+```python
+# 1. Open a SubScene for editing
+manage_scene(action="open_subscene", scene_name="Environment")
+
+# 2. View hierarchy — open SubScene roots appear alongside main scene roots
+manage_scene(action="get_hierarchy", page_size=100)
+
+# 3. Find objects inside open SubScenes (automatic — no special params needed)
+find_gameobjects(search_term="Tree", search_method="by_name")
+find_gameobjects(search_term="MeshRenderer", search_method="by_component")
+```
+
+### Modify Objects Inside SubScenes
+
+```python
+# Objects inside open SubScenes work with all existing tools
+# 1. Open the SubScene
+manage_scene(action="open_subscene", scene_name="Props")
+
+# 2. Find and modify objects (same as any scene object)
+result = find_gameobjects(search_term="Barrel", search_method="by_name")
+manage_gameobject(action="modify", target=result["ids"][0], position=[5, 0, 3])
+manage_components(action="set_property", target=result["ids"][0],
+    component_type="MeshRenderer", property="enabled", value=False)
+
+# 3. Close when done
+manage_scene(action="close_subscene", scene_name="Props")
+```
+
+### Full SubScene Workflow
+
+```python
+# Complete pattern: discover → open → work → close
+
+# 1. Check what SubScenes exist
+subscenes = manage_scene(action="list_subscenes")
+
+# 2. Open the one you need
+manage_scene(action="open_subscene", scene_name="LevelGeometry")
+
+# 3. Browse its contents
+hierarchy = manage_scene(action="get_hierarchy")
+
+# 4. Find specific objects
+walls = find_gameobjects(search_term="Wall", search_method="by_name")
+
+# 5. Batch modify
+commands = [
+    {"tool": "manage_components", "params": {
+        "action": "set_property", "target": wall_id,
+        "component_type": "MeshRenderer", "property": "enabled", "value": True
+    }}
+    for wall_id in walls["ids"]
+]
+batch_execute(commands=commands, parallel=True)
+
+# 6. Save the scene and close the SubScene
+manage_scene(action="save")
+manage_scene(action="close_subscene", scene_name="LevelGeometry")
+```
+
+### Key Points
+
+- **`find_gameobjects`** automatically searches inside open SubScenes — no special parameters needed.
+- **`get_hierarchy`** includes open SubScene roots alongside main scene roots.
+- **`manage_gameobject`** resolve-by-name also searches open SubScenes.
+- SubScenes must be **open for editing** (`isLoaded: true`) before their contents are accessible.
+- Use `open_subscene` / `close_subscene` to control which SubScenes are editable.
+- All SubScene features require `com.unity.entities` — projects without it are unaffected.
 
 ---
 

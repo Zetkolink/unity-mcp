@@ -1785,7 +1785,7 @@ wheels = [
 
 [[package]]
 name = "zetkolink-mcp-unity"
-version = "9.5.3"
+version = "9.5.4"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

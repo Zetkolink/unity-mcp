@@ -6,6 +6,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if UNITY_ENTITIES
+using Unity.Scenes;
+#endif
 
 namespace MCPForUnity.Editor.Helpers
 {
@@ -313,7 +316,41 @@ namespace MCPForUnity.Editor.Helpers
                     yield return go;
                 }
             }
+
+#if UNITY_ENTITIES
+            // Also enumerate GameObjects inside open SubScenes
+            foreach (var go in GetOpenSubSceneObjects(includeInactive))
+            {
+                yield return go;
+            }
+#endif
         }
+
+#if UNITY_ENTITIES
+        /// <summary>
+        /// Enumerates GameObjects inside SubScenes that are currently open for editing.
+        /// </summary>
+        private static IEnumerable<GameObject> GetOpenSubSceneObjects(bool includeInactive)
+        {
+            var subscenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
+            foreach (var sub in subscenes)
+            {
+                if (sub == null || !sub.IsLoaded) continue;
+
+                var editingScene = sub.EditingScene;
+                if (!editingScene.IsValid() || !editingScene.isLoaded) continue;
+
+                var roots = editingScene.GetRootGameObjects();
+                foreach (var root in roots)
+                {
+                    foreach (var go in GetObjectAndDescendants(root, includeInactive))
+                    {
+                        yield return go;
+                    }
+                }
+            }
+        }
+#endif
 
         private static IEnumerable<GameObject> GetObjectAndDescendants(GameObject obj, bool includeInactive)
         {

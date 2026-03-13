@@ -172,7 +172,20 @@ manage_scene(action="get_build_settings") # Build settings
 manage_scene(action="create", name="NewScene", path="Assets/Scenes/")
 manage_scene(action="load", path="Assets/Scenes/Main.unity")
 manage_scene(action="save")
+
+# SubScene actions (require com.unity.entities package)
+# List all SubScenes in the hierarchy
+manage_scene(action="list_subscenes")
+# Returns: {"count": 2, "subscenes": [{"name": "Environment", "is_loaded": true, "root_count": 5, ...}, ...]}
+
+# Open a SubScene for editing (makes its GameObjects visible to get_hierarchy and find_gameobjects)
+manage_scene(action="open_subscene", scene_name="Environment")
+
+# Close a SubScene (hides its GameObjects, returns to baked ECS data)
+manage_scene(action="close_subscene", scene_name="Environment")
 ```
+
+**SubScene integration:** When a SubScene is open for editing, its GameObjects automatically appear in `get_hierarchy` (as additional roots) and are searchable via `find_gameobjects`. You can also modify them with `manage_gameobject` and `manage_components` like any other GameObject.
 
 ### find_gameobjects
 

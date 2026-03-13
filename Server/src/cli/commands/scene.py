@@ -196,3 +196,65 @@ def build_settings():
     click.echo(format_output(result, config.format))
 
 
+@scene.command("list-subscenes")
+@handle_unity_errors
+def list_subscenes():
+    """List all SubScenes in the current scene hierarchy.
+
+    \b
+    Requires com.unity.entities package.
+
+    Examples:
+        unity-mcp scene list-subscenes
+    """
+    config = get_config()
+    result = run_command("manage_scene", {"action": "list_subscenes"}, config)
+    click.echo(format_output(result, config.format))
+
+
+@scene.command("open-subscene")
+@click.argument("scene_name")
+@handle_unity_errors
+def open_subscene(scene_name: str):
+    """Open a SubScene for editing in edit mode.
+
+    \b
+    Requires com.unity.entities package.
+
+    Examples:
+        unity-mcp scene open-subscene "Environment"
+    """
+    config = get_config()
+    params: dict[str, Any] = {
+        "action": "open_subscene",
+        "sceneName": scene_name,
+    }
+    result = run_command("manage_scene", params, config)
+    click.echo(format_output(result, config.format))
+    if result.get("success"):
+        print_success(f"Opened SubScene: {scene_name}")
+
+
+@scene.command("close-subscene")
+@click.argument("scene_name")
+@handle_unity_errors
+def close_subscene(scene_name: str):
+    """Close a SubScene that is open for editing.
+
+    \b
+    Requires com.unity.entities package.
+
+    Examples:
+        unity-mcp scene close-subscene "Environment"
+    """
+    config = get_config()
+    params: dict[str, Any] = {
+        "action": "close_subscene",
+        "sceneName": scene_name,
+    }
+    result = run_command("manage_scene", params, config)
+    click.echo(format_output(result, config.format))
+    if result.get("success"):
+        print_success(f"Closed SubScene: {scene_name}")
+
+
