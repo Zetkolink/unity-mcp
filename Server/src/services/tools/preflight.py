@@ -30,6 +30,7 @@ async def preflight(
     requires_no_tests: bool = False,
     wait_for_no_compile: bool = False,
     refresh_if_dirty: bool = False,
+    block_if_dirty: bool = False,
     max_wait_s: float = 30.0,
 ) -> MCPResponse | None:
     """
@@ -60,16 +61,20 @@ async def preflight(
     if not isinstance(data, dict):
         return None
 
+    assets = data.get("assets")
+    external_changes_dirty = isinstance(assets, dict) and assets.get("external_changes_dirty") is True
+
+    if external_changes_dirty and block_if_dirty:
+        return _busy("external_changes_dirty", 1000)
+
     # Optional refresh-if-dirty
-    if refresh_if_dirty:
-        assets = data.get("assets")
-        if isinstance(assets, dict) and assets.get("external_changes_dirty") is True:
-            try:
-                from services.tools.refresh_unity import refresh_unity
-                await refresh_unity(ctx, mode="if_dirty", scope="all", compile="request", wait_for_ready=True)
-            except Exception:
-                # Best-effort only; fall through to normal tool dispatch.
-                pass
+    if external_changes_dirty and refresh_if_dirty:
+        try:
+            from services.tools.refresh_unity import refresh_unity
+            await refresh_unity(ctx, mode="if_dirty", scope="all", compile="request", wait_for_ready=True)
+        except Exception:
+            # Best-effort only; fall through to normal tool dispatch.
+            pass
 
     # Tests running: fail fast for tools that require exclusivity.
     if requires_no_tests:

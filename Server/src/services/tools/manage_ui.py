@@ -9,11 +9,13 @@ import os
 from typing import Annotated, Any, Literal
 
 from fastmcp import Context
+from fastmcp.server.server import ToolResult
 from mcp.types import ToolAnnotations
 
 from services.registry import mcp_for_unity_tool
 from services.tools import get_unity_instance_from_context
 from services.tools.refresh_unity import send_mutation
+from services.tools.utils import extract_screenshot_images
 from transport.unity_transport import send_with_unity_instance
 from transport.legacy.unity_connection import async_send_command_with_retry
 
@@ -157,7 +159,7 @@ async def manage_ui(
     tooltip: Annotated[str,
                         "Set element tooltip text. For modify_visual_element."] | None = None,
 
-) -> dict[str, Any]:
+) -> dict[str, Any] | ToolResult:
     unity_instance = await get_unity_instance_from_context(ctx)
 
     action_lower = action.lower()
@@ -283,6 +285,11 @@ async def manage_ui(
                     del data["contentsEncoded"]
                 except Exception:
                     pass
+
+        if action_lower == "render_ui":
+            image_result = extract_screenshot_images(result)
+            if image_result is not None:
+                return image_result
         return result
 
     return {"success": False, "message": str(result)}

@@ -70,9 +70,12 @@ async def get_prefab_api_docs(_ctx: Context) -> MCPResponse:
                 "returns": ["assetPath", "guid", "prefabType", "rootObjectName", "rootComponentTypes", "childCount", "isVariant", "parentPrefab"]
             },
             "mcpforunity://prefab/{encoded_path}/hierarchy": {
-                "description": "Get full prefab hierarchy with nested prefab information",
+                "description": "Get prefab hierarchy with nested prefab information. Returns the first 200 items by default for payload safety.",
                 "example": "mcpforunity://prefab/Assets%2FPrefabs%2FPlayer.prefab/hierarchy",
-                "returns": ["prefabPath", "total", "items (with name, instanceId, path, componentTypes, prefab nesting info)"]
+                "parameters": {
+                    "max_items": "Maximum hierarchy items to return (default: 200). Use a larger value only when needed."
+                },
+                "returns": ["prefabPath", "total", "returnedCount", "truncated", "items (with name, instanceId, path, componentTypes, prefab nesting info)"]
             },
             "mcpforunity://editor/prefab-stage": {
                 "description": "Get info about the currently open prefab stage (if any)",
@@ -158,6 +161,9 @@ class PrefabHierarchyData(BaseModel):
     """Data for prefab hierarchy."""
     prefabPath: str
     total: int = 0
+    returnedCount: int = 0
+    truncated: bool = False
+    remainingCount: int = 0
     items: list[PrefabHierarchyItem] = []
 
 
@@ -169,11 +175,18 @@ class PrefabHierarchyResponse(MCPResponse):
 @mcp_for_unity_resource(
     uri="mcpforunity://prefab/{encoded_path}/hierarchy",
     name="prefab_hierarchy",
-    description="Get the full hierarchy of a prefab with nested prefab information. Returns all GameObjects with their components and nesting depth.\n\nURI: mcpforunity://prefab/{encoded_path}/hierarchy"
+    description="Get the hierarchy of a prefab with nested prefab information. Returns the first 200 items by default for payload safety; raise max_items only when needed.\n\nURI: mcpforunity://prefab/{encoded_path}/hierarchy"
 )
-async def get_prefab_hierarchy(ctx: Context, encoded_path: str) -> MCPResponse:
+async def get_prefab_hierarchy(
+    ctx: Context,
+    encoded_path: str,
+    max_items: int | None = 200,
+) -> MCPResponse:
     """Get prefab hierarchy by path."""
     unity_instance = await get_unity_instance_from_context(ctx)
+
+    if max_items is not None and max_items <= 0:
+        return MCPResponse(success=False, error="max_items must be a positive integer or null.")
 
     # Decode the URL-encoded path
     decoded_path = _decode_prefab_path(encoded_path)
@@ -187,5 +200,27 @@ async def get_prefab_hierarchy(ctx: Context, encoded_path: str) -> MCPResponse:
             "prefabPath": decoded_path
         }
     )
+
+    if isinstance(response, dict) and response.get("success"):
+        data = response.get("data")
+        if isinstance(data, dict):
+            items = data.get("items")
+            if isinstance(items, list):
+                total = int(data.get("total") or len(items))
+                if max_items is not None and len(items) > max_items:
+                    truncated_items = items[:max_items]
+                    remaining = max(total - len(truncated_items), 0)
+                    data["items"] = truncated_items
+                    data["returnedCount"] = len(truncated_items)
+                    data["truncated"] = True
+                    data["remainingCount"] = remaining
+                    data["note"] = (
+                        f"Prefab hierarchy was truncated to {len(truncated_items)} items for payload safety. "
+                        "Re-read with a larger max_items value if you need more."
+                    )
+                else:
+                    data["returnedCount"] = len(items)
+                    data["truncated"] = False
+                    data["remainingCount"] = max(total - len(items), 0)
 
     return _normalize_response(response)

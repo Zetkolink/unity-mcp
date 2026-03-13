@@ -15,6 +15,8 @@ from transport.unity_transport import send_with_unity_instance
 from transport.legacy.unity_connection import async_send_command_with_retry
 from services.tools.preflight import preflight
 
+READ_ONLY_ACTIONS = {"search", "get_info", "get_components"}
+
 
 @mcp_for_unity_tool(
     description=(
@@ -53,9 +55,13 @@ async def manage_asset(
 ) -> dict[str, Any]:
     unity_instance = await get_unity_instance_from_context(ctx)
 
-    # Best-effort guard: if Unity is compiling/reloading or known external changes are pending,
-    # wait/refresh to avoid stale reads and flaky timeouts.
-    gate = await preflight(ctx, wait_for_no_compile=True, refresh_if_dirty=True)
+    # Read-like actions should surface dirty editor state instead of triggering a hidden refresh/reload.
+    gate = await preflight(
+        ctx,
+        wait_for_no_compile=True,
+        refresh_if_dirty=action not in READ_ONLY_ACTIONS,
+        block_if_dirty=action in READ_ONLY_ACTIONS,
+    )
     if gate is not None:
         return gate.model_dump()
 
@@ -91,6 +97,13 @@ async def manage_asset(
         if (not filter_type) and asset_type and isinstance(asset_type, str):
             filter_type = asset_type
             await ctx.info("manage_asset(search): mapped `asset_type` into `filter_type` for safer server-side filtering")
+
+        # Preview thumbnails can make search responses much heavier than normal.
+        # If the caller opts into previews without paging, keep the default result
+        # set intentionally small to avoid large base64 payloads.
+        if generate_preview and page_size is None:
+            page_size = 10
+            await ctx.info("manage_asset(search): applied page_size=10 because generate_preview=true can produce heavy preview payloads")
 
     # Prepare parameters for the C# handler
     params_dict = {

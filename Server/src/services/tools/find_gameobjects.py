@@ -66,7 +66,7 @@ async def find_gameobjects(
 
     For detailed GameObject information, use the returned IDs with:
     - mcpforunity://scene/gameobject/{id} - Get full GameObject data
-    - mcpforunity://scene/gameobject/{id}/components - Get all components
+    - mcpforunity://scene/gameobject/{id}/components - Get paged component data (start with include_properties=false)
     - mcpforunity://scene/gameobject/{id}/component/{name} - Get specific component
     """
     unity_instance = await get_unity_instance_from_context(ctx)
@@ -78,7 +78,7 @@ async def find_gameobjects(
             "message": "Missing required parameter 'search_term'. Specify what to search for."
         }
 
-    gate = await preflight(ctx, wait_for_no_compile=True, refresh_if_dirty=True)
+    gate = await preflight(ctx, wait_for_no_compile=True, block_if_dirty=True)
     if gate is not None:
         return gate.model_dump()
 

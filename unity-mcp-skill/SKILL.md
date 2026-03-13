@@ -112,9 +112,20 @@ read_console(
 # Read mcpforunity://editor/state to check:
 # - is_compiling: Wait if true
 # - is_domain_reload_pending: Wait if true  
-# - ready_for_tools: Only proceed if true
-# - blocking_reasons: Why tools might fail
+# - advice.ready_for_tools: Only proceed if true
+# - advice.blocking_reasons: Why tools might fail
+# - assets.external_changes_dirty: Read-oriented tools may ask you to refresh or retry first
 ```
+
+### 6. If a Tool Seems Missing, Activate Its Group
+
+```python
+# Read mcpforunity://tool-groups to see available groups.
+manage_tools(action="list_groups")
+manage_tools(action="activate", group="ui")
+```
+
+**Why:** In HTTP sessions only the `core` group is visible by default. Use `manage_tools` before assuming a feature is unavailable.
 
 ## Parameter Type Conventions
 
@@ -160,6 +171,7 @@ uri="file:///full/path/to/file.cs"
 | **Scripts** | `create_script`, `script_apply_edits`, `refresh_unity` | C# code management |
 | **Assets** | `manage_asset`, `manage_prefabs` | Asset operations |
 | **Editor** | `manage_editor`, `execute_menu_item`, `read_console` | Editor control, package deployment (`deploy_package`/`restore_package` actions) |
+| **Meta** | `manage_tools`, `set_active_instance` | Tool visibility, group activation, and multi-instance routing |
 | **Testing** | `run_tests`, `get_test_job` | Unity Test Framework |
 | **Batch** | `batch_execute` | Parallel/bulk operations |
 | **Camera** | `manage_camera` | Camera management (Unity Camera + Cinemachine). **Tier 1** (always available): create, target, lens, priority, list, screenshot. **Tier 2** (requires `com.unity.cinemachine`): brain, body/aim/noise pipeline, extensions, blending, force/release. 7 presets: follow, third_person, freelook, dolly, static, top_down, side_scroller. Resource: `mcpforunity://scene/cameras`. Use `ping` to check Cinemachine availability. See [tools-reference.md](references/tools-reference.md#camera-tools). |

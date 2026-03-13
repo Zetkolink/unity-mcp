@@ -2,6 +2,7 @@
 
 import asyncio
 import base64
+import json
 
 import pytest
 
@@ -400,6 +401,37 @@ class TestManageUIRenderUI:
         p = captured["params"]
         for k in ("width", "height", "include_image", "max_resolution", "file_name"):
             assert k not in p
+
+    def test_render_ui_inline_image_returns_tool_result(self, monkeypatch):
+        async def fake_send(_ctx, _instance, _cmd, _params, **kwargs):
+            return {
+                "success": True,
+                "message": "Rendered",
+                "data": {
+                    "path": "Assets/Screenshots/test.png",
+                    "fullPath": "/tmp/test.png",
+                    "width": 640,
+                    "height": 360,
+                    "imageBase64": "ZmFrZS1wbmc=",
+                },
+            }
+
+        monkeypatch.setattr(manage_ui_mod, "send_mutation", fake_send)
+
+        resp = run_async(manage_ui_mod.manage_ui(
+            ctx=DummyContext(), action="render_ui",
+            target="UIRoot", include_image=True,
+        ))
+
+        assert hasattr(resp, "content")
+        assert len(resp.content) == 2
+        assert resp.content[0].type == "text"
+        text_payload = json.loads(resp.content[0].text)
+        assert text_payload["data"]["path"] == "Assets/Screenshots/test.png"
+        assert "fullPath" not in text_payload["data"]
+        assert "imageBase64" not in text_payload["data"]
+        assert resp.content[1].type == "image"
+        assert resp.content[1].data == "ZmFrZS1wbmc="
 
 
 class TestManageUILinkStylesheet:

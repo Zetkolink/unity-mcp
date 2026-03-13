@@ -1,6 +1,4 @@
 from typing import Any
-import os
-import sys
 
 from core.telemetry import get_package_version
 
@@ -14,8 +12,11 @@ from transport.plugin_hub import PluginHub
 
 @mcp_for_unity_tool(
     unity_target=None,
-    group=None,
-    description="Return the current FastMCP request context details (client_id, session_id, and meta dump).",
+    group="debug",
+    description=(
+        "Return a sanitized summary of the current FastMCP request context for troubleshooting "
+        "routing and session issues. Raw metadata and middleware internals are omitted."
+    ),
     annotations=ToolAnnotations(
         title="Debug Request Context",
         readOnlyHint=True,
@@ -32,31 +33,11 @@ async def debug_request_context(ctx: Context) -> dict[str, Any]:
     ctx_session_id = getattr(ctx, "session_id", None)
     ctx_client_id = getattr(ctx, "client_id", None)
 
-    meta_dump = None
-    if meta is not None:
-        try:
-            dump_fn = getattr(meta, "model_dump", None)
-            if callable(dump_fn):
-                meta_dump = dump_fn(exclude_none=False)
-            elif isinstance(meta, dict):
-                meta_dump = dict(meta)
-        except Exception as e:
-            meta_dump = {"_error": str(e)}
-
-    # List all ctx attributes for debugging
-    ctx_attrs = [attr for attr in dir(ctx) if not attr.startswith("_")]
-
     # Get session state info via middleware
     middleware = get_unity_instance_middleware()
     derived_key = await middleware.get_session_key(ctx)
     active_instance = await middleware.get_active_instance(ctx)
 
-    # Debugging middleware internals
-    # NOTE: These fields expose internal implementation details and may change between versions.
-    with middleware._lock:
-        all_keys = list(middleware._active_by_key.keys())
-
-    # Debugging PluginHub state
     plugin_hub_configured = PluginHub.is_configured()
 
     return {
@@ -64,25 +45,23 @@ async def debug_request_context(ctx: Context) -> dict[str, Any]:
         "data": {
             "server": {
                 "version": get_package_version(),
-                "cwd": os.getcwd(),
-                "argv": list(sys.argv),
             },
             "request_context": {
-                "client_id": rc_client_id,
-                "session_id": rc_session_id,
-                "meta": meta_dump,
+                "present": rc is not None,
+                "client_id_present": rc_client_id is not None,
+                "session_id_present": rc_session_id is not None,
+                "meta_present": meta is not None,
+                "meta_type": type(meta).__name__ if meta is not None else None,
             },
             "direct_properties": {
-                "session_id": ctx_session_id,
-                "client_id": ctx_client_id,
+                "session_id_present": ctx_session_id is not None,
+                "client_id_present": ctx_client_id is not None,
             },
             "session_state": {
-                "derived_key": derived_key,
+                "derived_key_present": derived_key is not None,
                 "active_instance": active_instance,
-                "all_keys_in_store": all_keys,
                 "plugin_hub_configured": plugin_hub_configured,
-                "middleware_id": id(middleware),
             },
-            "available_attributes": ctx_attrs,
+            "note": "Sanitized summary only; raw metadata and middleware internals are intentionally omitted.",
         },
     }

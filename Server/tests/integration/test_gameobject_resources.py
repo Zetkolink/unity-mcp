@@ -87,6 +87,7 @@ async def test_get_gameobject_components(monkeypatch):
 
     assert resp.success is True
     assert captured["params"]["instanceID"] == 12345
+    assert captured["params"]["includeProperties"] is False
 
 
 @pytest.mark.asyncio
@@ -251,4 +252,3 @@ async def test_get_gameobject_not_found(monkeypatch):
 
     assert resp.success is False
     assert "99999" in (resp.message or "")
-

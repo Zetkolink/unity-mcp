@@ -402,6 +402,14 @@ def normalize_color(value: Any, output_range: str = "float") -> tuple[list[float
     return None, f"color must be a list, dict, hex string, or JSON string, got {type(value).__name__}"
 
 
+def _sanitize_visual_payload(data: dict[str, Any]) -> dict[str, Any]:
+    """Remove fields that are noisy or overly host-specific for LLM-facing visual responses."""
+    return {
+        k: v for k, v in data.items()
+        if k not in {"imageBase64", "fullPath"}
+    }
+
+
 def extract_screenshot_images(response: dict[str, Any]) -> "ToolResult | None":
     """If a Unity response contains inline base64 images, return a ToolResult
     with TextContent + ImageContent blocks. Returns None for normal text-only responses.
@@ -424,7 +432,8 @@ def extract_screenshot_images(response: dict[str, Any]) -> "ToolResult | None":
         blocks: list[TextContent | ImageContent] = []
         summary_screenshots = []
         for s in screenshots:
-            summary_screenshots.append({k: v for k, v in s.items() if k != "imageBase64"})
+            if isinstance(s, dict):
+                summary_screenshots.append(_sanitize_visual_payload(s))
         text_result = {
             "success": True,
             "message": response.get("message", ""),
@@ -446,7 +455,7 @@ def extract_screenshot_images(response: dict[str, Any]) -> "ToolResult | None":
     image_b64 = data.get("imageBase64")
     if not image_b64:
         return None
-    text_data = {k: v for k, v in data.items() if k != "imageBase64"}
+    text_data = _sanitize_visual_payload(data)
     text_result = {"success": True, "message": response.get("message", ""), "data": text_data}
     return ToolResult(
         content=[

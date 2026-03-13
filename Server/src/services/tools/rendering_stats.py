@@ -34,7 +34,7 @@ async def rendering_stats(
         "Action to perform. get_stats=rendering counters, get_memory=memory usage, get_profiler=frame timing and system info."
     ],
 ) -> dict[str, Any]:
-    unity_instance = get_unity_instance_from_context(ctx)
+    unity_instance = await get_unity_instance_from_context(ctx)
 
     params = {"action": action}
 

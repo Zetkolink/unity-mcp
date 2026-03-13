@@ -10,6 +10,14 @@ from transport.unity_transport import send_with_unity_instance
 from transport.legacy.unity_connection import async_send_command_with_retry
 from services.tools.preflight import preflight
 
+READ_ONLY_ACTIONS = {
+    "get_hierarchy",
+    "get_active",
+    "get_build_settings",
+    "scene_view_frame",
+    "list_subscenes",
+}
+
 
 @mcp_for_unity_tool(
     description=(
@@ -66,7 +74,12 @@ async def manage_scene(
                           "SubScene name or GameObject name (for open_subscene/close_subscene)."] | None = None,
 ) -> dict[str, Any]:
     unity_instance = await get_unity_instance_from_context(ctx)
-    gate = await preflight(ctx, wait_for_no_compile=True, refresh_if_dirty=True)
+    gate = await preflight(
+        ctx,
+        wait_for_no_compile=True,
+        refresh_if_dirty=action not in READ_ONLY_ACTIONS,
+        block_if_dirty=action in READ_ONLY_ACTIONS,
+    )
     if gate is not None:
         return gate.model_dump()
     try:

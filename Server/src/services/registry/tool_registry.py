@@ -23,6 +23,7 @@ TOOL_GROUPS: dict[str, str] = {
     "scripting_ext": "ScriptableObject management",
     "testing": "Test runner & async test jobs",
     "probuilder": "ProBuilder 3D modeling – requires com.unity.probuilder package",
+    "debug": "Diagnostic and low-level troubleshooting tools (off by default)",
 }
 
 DEFAULT_ENABLED_GROUPS: set[str] = {"core"}

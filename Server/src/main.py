@@ -341,7 +341,7 @@ Payload sizing & paging (important):
 - `manage_scene(action="get_hierarchy")`:
   - Use `page_size` + `cursor` and follow `next_cursor` until null.
   - `page_size` is **items per page**; recommended starting point: **50**.
-- `manage_gameobject(action="get_components")`:
+- `mcpforunity://scene/gameobject/{id}/components`:
   - Start with `include_properties=false` (metadata-only) and small `page_size` (e.g. **10-25**).
   - Only request `include_properties=true` when needed; keep `page_size` small (e.g. **3-10**) to bound payloads.
 - `manage_asset(action="search")`:

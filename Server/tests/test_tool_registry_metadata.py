@@ -1,6 +1,6 @@
 import pytest
 
-from services.registry import get_registered_tools, mcp_for_unity_tool
+from services.registry import get_registered_tools, mcp_for_unity_tool, TOOL_GROUPS, DEFAULT_ENABLED_GROUPS
 import services.registry.tool_registry as tool_registry_module
 
 
@@ -62,3 +62,8 @@ def test_tool_registry_rejects_invalid_unity_target_values():
         @mcp_for_unity_tool(unity_target=123)  # type: ignore[arg-type]
         def _invalid_non_string_target_tool():
             return None
+
+
+def test_debug_group_is_available_but_not_enabled_by_default():
+    assert "debug" in TOOL_GROUPS
+    assert "debug" not in DEFAULT_ENABLED_GROUPS

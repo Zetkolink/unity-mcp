@@ -95,13 +95,27 @@ refresh_unity(
 )
 ```
 
+### manage_tools
+
+Enable or disable non-core tool groups for the current session.
+
+```python
+manage_tools(action="list_groups")
+manage_tools(action="activate", group="ui")
+manage_tools(action="activate", group="testing")
+manage_tools(action="sync")   # Sync with Unity Editor toggles
+manage_tools(action="reset")  # Restore defaults
+```
+
+Read `mcpforunity://tool-groups` first to see available groups and which tools each group contains. In HTTP mode, only `core` tools are visible by default in a fresh session.
+
 ---
 
 ## Scene Tools
 
 ### manage_scene
 
-Scene CRUD operations, hierarchy queries, screenshots, and scene view control.
+Scene CRUD operations, hierarchy queries, and scene view control. Use `manage_camera` for screenshots.
 
 ```python
 # Get hierarchy (paginated)
@@ -117,7 +131,7 @@ manage_scene(
 manage_camera(action="screenshot")
 
 # Screenshot with inline image (base64 PNG returned to AI)
-manage_scene(
+manage_camera(
     action="screenshot",
     camera="MainCamera",         # str, optional - camera name, path, or instance ID
     include_image=True,          # bool, default False - return base64 PNG inline
@@ -125,7 +139,7 @@ manage_scene(
 )
 
 # Batch surround — contact sheet of 6 fixed angles (front/back/left/right/top/bird_eye)
-manage_scene(
+manage_camera(
     action="screenshot",
     batch="surround",            # str - "surround" for 6-angle contact sheet
     max_resolution=256           # int - per-tile resolution cap
@@ -133,7 +147,7 @@ manage_scene(
 # Returns: single composite contact sheet image with labeled tiles
 
 # Batch surround centered on a specific target
-manage_scene(
+manage_camera(
     action="screenshot",
     batch="surround",
     look_at="Player",            # str|int|list[float] - center surround on this target
@@ -141,7 +155,7 @@ manage_scene(
 )
 
 # Batch orbit — configurable multi-angle grid around a target
-manage_scene(
+manage_camera(
     action="screenshot",
     batch="orbit",               # str - "orbit" for configurable angle grid
     look_at="Player",            # str|int|list[float] - target to orbit around
@@ -154,7 +168,7 @@ manage_scene(
 # Returns: single composite contact sheet (angles × elevations tiles in a grid)
 
 # Positioned screenshot (temp camera at viewpoint, no file saved)
-manage_scene(
+manage_camera(
     action="screenshot",
     look_at="Enemy",             # str|int|list[float] - target to aim at
     view_position=[0, 10, -10],  # list[float], optional - camera position
@@ -174,7 +188,20 @@ manage_scene(action="get_build_settings") # Build settings
 manage_scene(action="create", name="NewScene", path="Assets/Scenes/")
 manage_scene(action="load", path="Assets/Scenes/Main.unity")
 manage_scene(action="save")
+
+# SubScene actions (require com.unity.entities package)
+# List all SubScenes in the hierarchy
+manage_scene(action="list_subscenes")
+# Returns: {"count": 2, "subscenes": [{"name": "Environment", "is_loaded": true, "root_count": 5, ...}, ...]}
+
+# Open a SubScene for editing (makes its GameObjects visible to get_hierarchy and find_gameobjects)
+manage_scene(action="open_subscene", scene_name="Environment")
+
+# Close a SubScene (hides its GameObjects, returns to baked ECS data)
+manage_scene(action="close_subscene", scene_name="Environment")
 ```
+
+**SubScene integration:** When a SubScene is open for editing, its GameObjects automatically appear in `get_hierarchy` (as additional roots) and are searchable via `find_gameobjects`. You can also modify them with `manage_gameobject` and `manage_components` like any other GameObject.
 
 ### find_gameobjects
 

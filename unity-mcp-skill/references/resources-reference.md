@@ -10,6 +10,7 @@ Resources provide read-only access to Unity state. Use resources to inspect befo
 - [Scene & GameObject Resources](#scene--gameobject-resources)
 - [Prefab Resources](#prefab-resources)
 - [Project Resources](#project-resources)
+- [Tool Group Resources](#tool-group-resources)
 - [Instance Resources](#instance-resources)
 - [Test Resources](#test-resources)
 
@@ -23,7 +24,7 @@ All resources use `mcpforunity://` scheme:
 mcpforunity://{category}/{resource_path}[?query_params]
 ```
 
-**Categories:** `editor`, `scene`, `prefab`, `project`, `pipeline`, `rendering`, `menu-items`, `custom-tools`, `tests`, `instances`
+**Categories:** `editor`, `scene`, `prefab`, `project`, `pipeline`, `rendering`, `menu-items`, `custom-tools`, `tests`, `instances`, `tool-groups`
 
 ---
 
@@ -36,20 +37,33 @@ mcpforunity://{category}/{resource_path}[?query_params]
 **Returns:**
 ```json
 {
-  "unity_version": "2022.3.10f1",
-  "is_compiling": false,
-  "is_domain_reload_pending": false,
-  "play_mode": {
-    "is_playing": false,
-    "is_paused": false
+  "unity": {
+    "instance_id": "MyProject@abc123",
+    "unity_version": "2022.3.10f1"
   },
-  "active_scene": {
-    "path": "Assets/Scenes/Main.unity",
-    "name": "Main"
+  "editor": {
+    "play_mode": {
+      "is_playing": false,
+      "is_paused": false
+    },
+    "active_scene": {
+      "path": "Assets/Scenes/Main.unity",
+      "name": "Main"
+    }
   },
-  "ready_for_tools": true,
-  "blocking_reasons": [],
-  "recommended_retry_after_ms": null,
+  "compilation": {
+    "is_compiling": false,
+    "is_domain_reload_pending": false
+  },
+  "assets": {
+    "external_changes_dirty": false
+  },
+  "advice": {
+    "ready_for_tools": true,
+    "blocking_reasons": [],
+    "recommended_retry_after_ms": 0,
+    "recommended_next_action": "none"
+  },
   "staleness": {
     "age_ms": 150,
     "is_stale": false
@@ -58,10 +72,12 @@ mcpforunity://{category}/{resource_path}[?query_params]
 ```
 
 **Key Fields:**
-- `ready_for_tools`: Only proceed if `true`
-- `is_compiling`: Wait if `true`
-- `blocking_reasons`: Array explaining why tools might fail
-- `recommended_retry_after_ms`: Suggested wait time
+- `advice.ready_for_tools`: Only proceed if `true`
+- `compilation.is_compiling`: Wait if `true`
+- `advice.blocking_reasons`: Array explaining why tools might fail
+- `advice.recommended_retry_after_ms`: Suggested wait time
+- `assets.external_changes_dirty`: Read-oriented tools may return retry/busy until Unity refreshes
+- `advice.recommended_next_action`: Server hint such as `retry_later`
 
 ### mcpforunity://editor/selection
 
@@ -72,9 +88,15 @@ mcpforunity://{category}/{resource_path}[?query_params]
 {
   "activeObject": "Player",
   "activeGameObject": "Player",
+  "activeTransform": "Player",
   "activeInstanceID": 12345,
   "count": 3,
-  "gameObjects": ["Player", "Enemy", "Wall"],
+  "objects": [
+    {"name": "Player", "type": "GameObject", "instanceID": 12345}
+  ],
+  "gameObjects": [
+    {"name": "Player", "instanceID": 12345}
+  ],
   "assetGUIDs": []
 }
 ```
@@ -315,13 +337,13 @@ mcpforunity://{category}/{resource_path}[?query_params]
 
 ### mcpforunity://scene/gameobject/{instance_id}/components
 
-**Purpose:** All components with full property serialization (paginated).
+**Purpose:** All components on a GameObject (paginated). Metadata-only by default.
 
 **Parameters:**
 - `instance_id` (int): GameObject instance ID
 - `page_size` (int): Default 25, max 100
 - `cursor` (int): Pagination cursor
-- `include_properties` (bool): Default true, set false for just types
+- `include_properties` (bool): Default false, set true only when you need full serialized properties
 
 **Returns:**
 ```json
@@ -413,13 +435,18 @@ Assets/Prefabs/Player.prefab → Assets%2FPrefabs%2FPlayer.prefab
 
 ### mcpforunity://prefab/{encoded_path}/hierarchy
 
-**Purpose:** Full prefab hierarchy with nested prefab info.
+**Purpose:** Prefab hierarchy with nested prefab info. Returns the first 200 items by default for payload safety.
+
+**Parameters:**
+- `max_items` (int): Default 200. Increase only when you need a larger slice of the hierarchy.
 
 **Returns:**
 ```json
 {
   "prefabPath": "Assets/Prefabs/Player.prefab",
   "total": 6,
+  "returnedCount": 6,
+  "truncated": false,
   "items": [
     {
       "name": "Player",
@@ -481,6 +508,32 @@ Assets/Prefabs/Player.prefab → Assets%2FPrefabs%2FPlayer.prefab
   "5": "UI",
   "8": "Player",
   "9": "Enemy"
+}
+```
+
+---
+
+## Tool Group Resources
+
+### mcpforunity://tool-groups
+
+**Purpose:** Available MCP tool groups and the tools inside them. Read this before calling `manage_tools`.
+
+**Returns:**
+```json
+{
+  "groups": [
+    {
+      "name": "ui",
+      "description": "UI Toolkit (UXML, USS, UIDocument)",
+      "default_enabled": false,
+      "tools": ["manage_ui"],
+      "tool_count": 1
+    }
+  ],
+  "total_groups": 7,
+  "default_enabled": ["core"],
+  "usage": "Call manage_tools(action='activate', group='<name>') to enable a group."
 }
 ```
 
@@ -602,7 +655,8 @@ Assets/Prefabs/Player.prefab → Assets%2FPrefabs%2FPlayer.prefab
 ```python
 # Before any complex operation:
 # Read mcpforunity://editor/state
-# Check ready_for_tools == true
+# Check advice.ready_for_tools == true
+# If assets.external_changes_dirty == true, expect retry/busy until Unity refreshes
 ```
 
 ### 2. Use Find Then Read Pattern

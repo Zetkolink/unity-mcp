@@ -13,7 +13,9 @@ Common workflows and patterns for effective Unity-MCP usage.
 - [UI Creation Workflows](#ui-creation-workflows)
 - [Camera & Cinemachine Workflows](#camera--cinemachine-workflows)
 - [ProBuilder Workflows](#probuilder-workflows)
-- [SubScene Workflows](#subscene-workflows)
+- [Graphics & Rendering Workflows](#graphics--rendering-workflows)
+- [Package Management Workflows](#package-management-workflows)
+- [Package Deployment Workflows](#package-deployment-workflows)
 - [Batch Operations](#batch-operations)
 
 ---
@@ -26,11 +28,11 @@ Common workflows and patterns for effective Unity-MCP usage.
 # 1. Check editor state
 # Read mcpforunity://editor/state
 
-# 2. Verify ready_for_tools == true
-# If false, wait for recommended_retry_after_ms
+# 2. Verify editor_state["advice"]["ready_for_tools"] == true
+# If false, wait for editor_state["advice"]["recommended_retry_after_ms"]
 
 # 3. Check active scene
-# Read mcpforunity://editor/state → active_scene
+# Read mcpforunity://editor/state → editor.active_scene
 
 # 4. List available instances (multi-instance)
 # Read mcpforunity://instances
@@ -42,14 +44,27 @@ Common workflows and patterns for effective Unity-MCP usage.
 # Quick readiness check pattern:
 editor_state = read_resource("mcpforunity://editor/state")
 
-if not editor_state["ready_for_tools"]:
-    # Check blocking_reasons
-    # Wait recommended_retry_after_ms
+if not editor_state["advice"]["ready_for_tools"]:
+    # Check editor_state["advice"]["blocking_reasons"]
+    # Wait editor_state["advice"]["recommended_retry_after_ms"]
     pass
 
-if editor_state["is_compiling"]:
+if editor_state["compilation"]["is_compiling"]:
     # Wait for compilation to complete
     pass
+
+if editor_state["assets"]["external_changes_dirty"]:
+    # Read-oriented tools may return retry/busy until Unity refreshes
+    pass
+```
+
+### Missing Tool Activation
+
+```python
+# Some sessions only expose core tools by default.
+# Read mcpforunity://tool-groups
+manage_tools(action="list_groups")
+manage_tools(action="activate", group="ui")
 ```
 
 ---
@@ -157,7 +172,7 @@ manage_gameobject(action="modify", target="Main Camera", position=[0, 5, -10],
     rotation=[30, 0, 0])
 
 # 5. Verify with screenshot
-manage_scene(action="screenshot")
+manage_camera(action="screenshot")
 
 # 6. Save scene
 manage_scene(action="save")
@@ -347,7 +362,7 @@ manage_material(
 )
 
 # 3. Verify visually
-manage_scene(action="screenshot")
+manage_camera(action="screenshot")
 ```
 
 ### Create Procedural Texture
@@ -557,7 +572,7 @@ for item in hierarchy["data"]["items"]:
         print(f"Object {item['name']} fell through floor!")
 
 # 3. Visual verification
-manage_scene(action="screenshot")
+manage_camera(action="screenshot")
 ```
 
 ---
@@ -1586,7 +1601,7 @@ manage_probuilder(action="auto_smooth", target="Pillar1",
     properties={"angleThreshold": 45})
 
 # 6. Screenshot to verify
-manage_scene(action="screenshot", include_image=True, max_resolution=512)
+manage_camera(action="screenshot", include_image=True, max_resolution=512)
 ```
 
 ### Edit-Verify Loop Pattern
@@ -1613,91 +1628,241 @@ manage_probuilder(action="delete_faces", target="Obj", properties={"faceIndices"
 
 ---
 
-## SubScene Workflows
+## Graphics & Rendering Workflows
 
-> **Requires:** `com.unity.entities` package. All SubScene operations work in **Edit mode** only.
+### Setting Up Post-Processing
 
-SubScenes (part of Unity DOTS/Entities) are containers that serialize GameObjects into an optimized binary format. Objects inside SubScenes are invisible to normal scene queries until the SubScene is opened for editing. These workflows show how to discover, open, browse, and modify SubScene contents.
-
-### Discover SubScenes
+Add post-processing effects to a URP/HDRP scene using Volumes.
 
 ```python
-# List all SubScenes in the current scene with open/closed status
-result = manage_scene(action="list_subscenes")
-# Returns: name, gameObjectName, scenePath, isLoaded (open for editing), isValid
+# 1. Check pipeline status and available effects
+manage_graphics(action="ping")
+
+# 2. List available volume effects for the active pipeline
+manage_graphics(action="volume_list_effects")
+
+# 3. Create a global post-processing volume with common effects
+manage_graphics(action="volume_create", name="GlobalPostProcess", is_global=True,
+    effects=[
+        {"type": "Bloom", "parameters": {"intensity": 1.0, "threshold": 0.9, "scatter": 0.7}},
+        {"type": "Vignette", "parameters": {"intensity": 0.35}},
+        {"type": "Tonemapping", "parameters": {"mode": 1}},
+        {"type": "ColorAdjustments", "parameters": {"postExposure": 0.2, "contrast": 10}}
+    ])
+
+# 4. Verify the volume was created
+# Read mcpforunity://scene/volumes
+
+# 5. Fine-tune an effect parameter
+manage_graphics(action="volume_set_effect", target="GlobalPostProcess",
+    effect="Bloom", parameters={"intensity": 1.5})
+
+# 6. Screenshot to verify visual result
+manage_camera(action="screenshot", include_image=True, max_resolution=512)
 ```
 
-### Open and Browse SubScene Contents
+**Tips:**
+- Always `ping` first to confirm URP/HDRP is active. Volumes do nothing on Built-in RP.
+- Use `volume_list_effects` to discover available effect types for the active pipeline (URP and HDRP have different sets).
+- Use `volume_get_info` to inspect current effect parameters before modifying.
+- Create a reusable VolumeProfile asset with `volume_create_profile` and reference it via `profile_path` on multiple volumes.
+
+### Adding a Full-Screen Effect via Renderer Features (URP)
+
+Add a custom full-screen shader pass using URP Renderer Features.
 
 ```python
-# 1. Open a SubScene for editing
-manage_scene(action="open_subscene", scene_name="Environment")
+# 1. Check pipeline and confirm URP
+manage_graphics(action="ping")
 
-# 2. View hierarchy — open SubScene roots appear alongside main scene roots
-manage_scene(action="get_hierarchy", page_size=100)
+# 2. Create a material for the full-screen effect
+manage_material(action="create",
+    material_path="Assets/Materials/GrayscaleEffect.mat",
+    shader="Shader Graphs/GrayscaleFullScreen")
 
-# 3. Find objects inside open SubScenes (automatic — no special params needed)
-find_gameobjects(search_term="Tree", search_method="by_name")
-find_gameobjects(search_term="MeshRenderer", search_method="by_component")
+# 3. List current renderer features
+manage_graphics(action="feature_list")
+
+# 4. Add a FullScreenPassRendererFeature with the material
+manage_graphics(action="feature_add",
+    feature_type="FullScreenPassRendererFeature",
+    name="GrayscalePass",
+    material="Assets/Materials/GrayscaleEffect.mat")
+
+# 5. Verify it was added
+manage_graphics(action="feature_list")
+
+# 6. Toggle it on/off to compare
+manage_graphics(action="feature_toggle", index=0, active=False)  # disable
+manage_camera(action="screenshot", include_image=True, max_resolution=512)
+
+manage_graphics(action="feature_toggle", index=0, active=True)   # re-enable
+manage_camera(action="screenshot", include_image=True, max_resolution=512)
+
+# 7. Reorder features if needed (execution order matters)
+manage_graphics(action="feature_reorder", order=[1, 0, 2])
 ```
 
-### Modify Objects Inside SubScenes
+**Tips:**
+- Renderer Features are URP-only. `feature_*` actions return an error on HDRP or Built-in RP.
+- Read `mcpforunity://pipeline/renderer-features` to inspect features without modifying.
+- Feature execution order affects the final image. Use `feature_reorder` to control pass ordering.
+
+### Configuring Light Baking
+
+Set up lightmaps, light probes, and reflection probes for baked GI.
 
 ```python
-# Objects inside open SubScenes work with all existing tools
-# 1. Open the SubScene
-manage_scene(action="open_subscene", scene_name="Props")
+# 1. Set lights to Baked or Mixed mode
+manage_components(action="set_property", target="Directional Light",
+    component_type="Light", properties={"lightmapBakeType": 1})  # 1 = Mixed
 
-# 2. Find and modify objects (same as any scene object)
-result = find_gameobjects(search_term="Barrel", search_method="by_name")
-manage_gameobject(action="modify", target=result["ids"][0], position=[5, 0, 3])
-manage_components(action="set_property", target=result["ids"][0],
-    component_type="MeshRenderer", property="enabled", value=False)
+# 2. Mark static objects for lightmapping
+manage_gameobject(action="modify", target="Environment",
+    component_properties={"StaticFlags": "ContributeGI"})
 
-# 3. Close when done
-manage_scene(action="close_subscene", scene_name="Props")
+# 3. Configure lightmap settings
+manage_graphics(action="bake_get_settings")
+manage_graphics(action="bake_set_settings", settings={
+    "lightmapper": 1,           # 1 = Progressive GPU
+    "directSamples": 32,
+    "indirectSamples": 128,
+    "maxBounces": 4,
+    "lightmapResolution": 40
+})
+
+# 4. Place light probes for dynamic objects
+manage_graphics(action="bake_create_light_probe_group", name="MainProbeGrid",
+    position=[0, 1.5, 0], grid_size=[5, 3, 5], spacing=3.0)
+
+# 5. Place a reflection probe for an interior room
+manage_graphics(action="bake_create_reflection_probe", name="RoomReflection",
+    position=[0, 2, 0], size=[8, 4, 8], resolution=256,
+    hdr=True, box_projection=True)
+
+# 6. Start async bake
+manage_graphics(action="bake_start", async_bake=True)
+
+# 7. Poll bake status
+manage_graphics(action="bake_status")
+# Repeat until complete
+
+# 8. Bake the reflection probe separately if needed
+manage_graphics(action="bake_reflection_probe", target="RoomReflection")
+
+# 9. Check rendering stats after bake
+manage_graphics(action="stats_get")
 ```
 
-### Full SubScene Workflow
+**Tips:**
+- Baking only works in Edit mode. If the editor is in Play mode, `bake_start` will fail.
+- Use `bake_cancel` to abort a long bake.
+- `bake_clear` removes all baked data (lightmaps, probes). Use before re-baking from scratch.
+- For large scenes, use `async_bake=True` (default) and poll `bake_status` periodically.
+
+---
+
+## Package Management Workflows
+
+### Install a Package and Verify
 
 ```python
-# Complete pattern: discover → open → work → close
+# 1. Check what's installed
+manage_packages(action="ping")
+manage_packages(action="list_packages")
+# Poll status until complete
+manage_packages(action="status", job_id="<job_id>")
 
-# 1. Check what SubScenes exist
-subscenes = manage_scene(action="list_subscenes")
+# 2. Install the package
+manage_packages(action="add_package", package="com.unity.inputsystem")
+# Poll until domain reload completes
+manage_packages(action="status", job_id="<job_id>")
 
-# 2. Open the one you need
-manage_scene(action="open_subscene", scene_name="LevelGeometry")
+# 3. Verify no compilation errors
+read_console(types=["error"], count=10)
 
-# 3. Browse its contents
-hierarchy = manage_scene(action="get_hierarchy")
-
-# 4. Find specific objects
-walls = find_gameobjects(search_term="Wall", search_method="by_name")
-
-# 5. Batch modify
-commands = [
-    {"tool": "manage_components", "params": {
-        "action": "set_property", "target": wall_id,
-        "component_type": "MeshRenderer", "property": "enabled", "value": True
-    }}
-    for wall_id in walls["ids"]
-]
-batch_execute(commands=commands, parallel=True)
-
-# 6. Save the scene and close the SubScene
-manage_scene(action="save")
-manage_scene(action="close_subscene", scene_name="LevelGeometry")
+# 4. Confirm it's installed
+manage_packages(action="get_package_info", package="com.unity.inputsystem")
 ```
 
-### Key Points
+### Add OpenUPM Registry and Install Package
 
-- **`find_gameobjects`** automatically searches inside open SubScenes — no special parameters needed.
-- **`get_hierarchy`** includes open SubScene roots alongside main scene roots.
-- **`manage_gameobject`** resolve-by-name also searches open SubScenes.
-- SubScenes must be **open for editing** (`isLoaded: true`) before their contents are accessible.
-- Use `open_subscene` / `close_subscene` to control which SubScenes are editable.
-- All SubScene features require `com.unity.entities` — projects without it are unaffected.
+```python
+# 1. Add the OpenUPM scoped registry
+manage_packages(
+    action="add_registry",
+    name="OpenUPM",
+    url="https://package.openupm.com",
+    scopes=["com.cysharp"]
+)
+
+# 2. Force resolution to pick up the new registry
+manage_packages(action="resolve_packages")
+
+# 3. Install a package from OpenUPM
+manage_packages(action="add_package", package="com.cysharp.unitask")
+manage_packages(action="status", job_id="<job_id>")
+```
+
+### Safe Package Removal
+
+```python
+# 1. Check dependencies before removing
+manage_packages(action="remove_package", package="com.unity.modules.ui")
+# If blocked: "Cannot remove: 3 package(s) depend on it"
+
+# 2. Force removal if you're sure
+manage_packages(action="remove_package", package="com.unity.modules.ui", force=True)
+manage_packages(action="status", job_id="<job_id>")
+```
+
+### Install from Git URL (e.g., NuGetForUnity)
+
+```python
+# Git URLs trigger a security warning — ensure the source is trusted
+manage_packages(
+    action="add_package",
+    package="https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity"
+)
+manage_packages(action="status", job_id="<job_id>")
+```
+
+---
+
+## Package Deployment Workflows
+
+### Iterative Development Loop (Edit → Deploy → Test)
+
+Use `deploy_package` to copy your local MCPForUnity source into the project's installed package location. This bypasses the UI dialog and triggers recompilation automatically.
+
+```python
+# Prerequisites: Set the MCPForUnity source path in Advanced Settings first.
+
+# 1. Make code changes (e.g., edit C# tools)
+# script_apply_edits or create_script as needed
+
+# 2. Deploy the updated package (copies source → installed package, creates backup)
+manage_editor(action="deploy_package")
+
+# 3. Wait for recompilation to finish
+refresh_unity(mode="force", compile="request", wait_for_ready=True)
+
+# 4. Check for compilation errors
+read_console(types=["error"], count=10, include_stacktrace=True)
+
+# 5. Test the changes
+run_tests(mode="EditMode")
+```
+
+### Rollback After Failed Deploy
+
+```python
+# Restore from the automatic pre-deployment backup
+manage_editor(action="restore_package")
+
+# Wait for recompilation
+refresh_unity(mode="force", compile="request", wait_for_ready=True)
+```
 
 ---
 
@@ -1792,7 +1957,7 @@ max_retries = 5
 for attempt in range(max_retries):
     try:
         editor_state = read_resource("mcpforunity://editor/state")
-        if editor_state["ready_for_tools"]:
+        if editor_state["advice"]["ready_for_tools"]:
             break
     except:
         time.sleep(2 ** attempt)  # Exponential backoff

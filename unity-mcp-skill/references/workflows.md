@@ -28,11 +28,11 @@ Common workflows and patterns for effective Unity-MCP usage.
 # 1. Check editor state
 # Read mcpforunity://editor/state
 
-# 2. Verify ready_for_tools == true
-# If false, wait for recommended_retry_after_ms
+# 2. Verify editor_state["advice"]["ready_for_tools"] == true
+# If false, wait for editor_state["advice"]["recommended_retry_after_ms"]
 
 # 3. Check active scene
-# Read mcpforunity://editor/state → active_scene
+# Read mcpforunity://editor/state → editor.active_scene
 
 # 4. List available instances (multi-instance)
 # Read mcpforunity://instances
@@ -44,14 +44,27 @@ Common workflows and patterns for effective Unity-MCP usage.
 # Quick readiness check pattern:
 editor_state = read_resource("mcpforunity://editor/state")
 
-if not editor_state["ready_for_tools"]:
-    # Check blocking_reasons
-    # Wait recommended_retry_after_ms
+if not editor_state["advice"]["ready_for_tools"]:
+    # Check editor_state["advice"]["blocking_reasons"]
+    # Wait editor_state["advice"]["recommended_retry_after_ms"]
     pass
 
-if editor_state["is_compiling"]:
+if editor_state["compilation"]["is_compiling"]:
     # Wait for compilation to complete
     pass
+
+if editor_state["assets"]["external_changes_dirty"]:
+    # Read-oriented tools may return retry/busy until Unity refreshes
+    pass
+```
+
+### Missing Tool Activation
+
+```python
+# Some sessions only expose core tools by default.
+# Read mcpforunity://tool-groups
+manage_tools(action="list_groups")
+manage_tools(action="activate", group="ui")
 ```
 
 ---
@@ -1944,7 +1957,7 @@ max_retries = 5
 for attempt in range(max_retries):
     try:
         editor_state = read_resource("mcpforunity://editor/state")
-        if editor_state["ready_for_tools"]:
+        if editor_state["advice"]["ready_for_tools"]:
             break
     except:
         time.sleep(2 ** attempt)  # Exponential backoff

@@ -69,12 +69,12 @@ async def get_gameobject_api_docs(_ctx: Context) -> MCPResponse:
                 "returns": ["instanceID", "name", "tag", "layer", "transform", "componentTypes", "path", "parent", "children"]
             },
             "mcpforunity://scene/gameobject/{instance_id}/components": {
-                "description": "Get all components with full property serialization (paginated)",
+                "description": "Get all components (paginated). Metadata-only by default; opt into full property serialization when needed.",
                 "example": "mcpforunity://scene/gameobject/-81840/components",
                 "parameters": {
                     "page_size": "Number of components per page (default: 25)",
                     "cursor": "Pagination offset (default: 0)",
-                    "include_properties": "Include full property data (default: true)"
+                    "include_properties": "Include full property data (default: false)"
                 }
             },
             "mcpforunity://scene/gameobject/{instance_id}/component/{component_name}": {
@@ -159,7 +159,7 @@ class ComponentsData(BaseModel):
     nextCursor: int | None = None
     totalCount: int = 0
     hasMore: bool = False
-    includeProperties: bool = True
+    includeProperties: bool = False
 
 
 class ComponentsResponse(MCPResponse):
@@ -170,14 +170,14 @@ class ComponentsResponse(MCPResponse):
 @mcp_for_unity_resource(
     uri="mcpforunity://scene/gameobject/{instance_id}/components",
     name="gameobject_components",
-    description="Get all components on a GameObject with full property serialization. Supports pagination with pageSize and cursor parameters.\n\nURI: mcpforunity://scene/gameobject/{instance_id}/components"
+    description="Get all components on a GameObject. Returns metadata-only by default; set include_properties=true for full serialized properties. Supports pagination with pageSize and cursor parameters.\n\nURI: mcpforunity://scene/gameobject/{instance_id}/components"
 )
 async def get_gameobject_components(
     ctx: Context,
     instance_id: str,
     page_size: int = 25,
     cursor: int = 0,
-    include_properties: bool = True
+    include_properties: bool = False
 ) -> MCPResponse:
     """Get all components on a GameObject."""
     unity_instance = await get_unity_instance_from_context(ctx)

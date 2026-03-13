@@ -56,7 +56,7 @@ async def manage_build(
     platform: Annotated[str, "Target platform for defines"] | None = None,
     defines: Annotated[str, "Comma-separated scripting define symbols"] | None = None,
 ) -> dict[str, Any]:
-    unity_instance = get_unity_instance_from_context(ctx)
+    unity_instance = await get_unity_instance_from_context(ctx)
 
     params = {
         "action": action,
