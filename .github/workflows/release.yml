@@ -473,7 +473,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/mcpforunityserver
+      url: https://pypi.org/p/zetkolink-mcp-unity
     permissions:
       contents: read
       id-token: write

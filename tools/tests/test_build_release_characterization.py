@@ -139,7 +139,7 @@ def sample_pyproject_toml():
     Challenge: Regex must preserve exact formatting
     """
     return '''[project]
-name = "mcpforunityserver"
+name = "zetkolink-mcp-unity"
 version = "9.2.0"
 description = "MCP for Unity Server"
 readme = "README.md"
@@ -164,12 +164,12 @@ def sample_readme_content():
 
 Install from git:
 ```bash
-pip install git+https://github.com/CoplayDev/unity-mcp@v9.2.0#subdirectory=Server
+pip install git+https://github.com/Zetkolink/unity-mcp@v9.2.0#subdirectory=Server
 ```
 
 Or via package URL:
 ```
-https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v9.2.0
+https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#v9.2.0
 ```
 '''
 
@@ -305,8 +305,8 @@ class TestVersionBumpingLogic:
         3. CRITICAL: Fragment hash # not escaped in regex
 
         Pattern:
-        FROM: git+https://github.com/CoplayDev/unity-mcp@v9.2.0#subdirectory=Server
-        TO:   git+https://github.com/CoplayDev/unity-mcp@v9.3.0#subdirectory=Server
+        FROM: git+https://github.com/Zetkolink/unity-mcp@v9.2.0#subdirectory=Server
+        TO:   git+https://github.com/Zetkolink/unity-mcp@v9.3.0#subdirectory=Server
         """
         temp_repo["server_readme"].write_text(sample_readme_content, encoding="utf-8")
 
@@ -314,8 +314,8 @@ class TestVersionBumpingLogic:
         content = temp_repo["server_readme"].read_text(encoding="utf-8")
 
         # Pattern from update_versions.py
-        pattern = r'git\+https://github\.com/CoplayDev/unity-mcp@v[0-9]+\.[0-9]+\.[0-9]+#subdirectory=Server'
-        replacement = f'git+https://github.com/CoplayDev/unity-mcp@v{new_version}#subdirectory=Server'
+        pattern = r'git\+https://github\.com/Zetkolink/unity-mcp@v[0-9]+\.[0-9]+\.[0-9]+#subdirectory=Server'
+        replacement = f'git+https://github.com/Zetkolink/unity-mcp@v{new_version}#subdirectory=Server'
 
         assert re.search(pattern, content) is not None
 
@@ -333,8 +333,8 @@ class TestVersionBumpingLogic:
         2. Replace version in fragment
 
         Pattern:
-        FROM: https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v9.2.0
-        TO:   https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v9.3.0
+        FROM: https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#v9.2.0
+        TO:   https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#v9.3.0
         """
         temp_repo["root_readme"].write_text(sample_readme_content, encoding="utf-8")
 
@@ -342,8 +342,8 @@ class TestVersionBumpingLogic:
         content = temp_repo["root_readme"].read_text(encoding="utf-8")
 
         # Pattern from update_versions.py
-        pattern = r'https://github\.com/CoplayDev/unity-mcp\.git\?path=/MCPForUnity#v[0-9]+\.[0-9]+\.[0-9]+'
-        replacement = f'https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v{new_version}'
+        pattern = r'https://github\.com/Zetkolink/unity-mcp\.git\?path=/MCPForUnity#v[0-9]+\.[0-9]+\.[0-9]+'
+        replacement = f'https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#v{new_version}'
 
         if re.search(pattern, content):
             new_content = re.sub(pattern, replacement, content)

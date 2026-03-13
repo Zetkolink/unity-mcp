@@ -10,7 +10,7 @@ Model Context Protocol server for Unity Editor integration. Control Unity throug
 
 💬 **Join our community:** [Discord Server](https://discord.gg/y4p8KfzrN4)
 
-**Required:** Install the [Unity MCP Plugin](https://github.com/CoplayDev/unity-mcp?tab=readme-ov-file#-step-1-install-the-unity-package) to connect Unity Editor with this MCP server.
+**Required:** Install the [Unity MCP Plugin](https://github.com/Zetkolink/unity-mcp?tab=readme-ov-file#-step-1-install-the-unity-package) to connect Unity Editor with this MCP server.
 
 ---
 
@@ -107,7 +107,7 @@ In this mode:
 }
 ```
 
-For full details, see the [Remote Server Auth Guide](https://github.com/CoplayDev/unity-mcp/blob/main/docs/guides/REMOTE_SERVER_AUTH.md).
+For full details, see the [Remote Server Auth Guide](https://github.com/Zetkolink/unity-mcp/blob/main/docs/guides/REMOTE_SERVER_AUTH.md).
 
 ---
 
@@ -127,10 +127,10 @@ Once connected, try these commands in your AI assistant:
 
 For complete documentation, troubleshooting, and advanced usage, please visit the GitHub repository:
 
-📖 **[Full Documentation](https://github.com/CoplayDev/unity-mcp#readme)**
+📖 **[Full Documentation](https://github.com/Zetkolink/unity-mcp#readme)**
 
 ---
 
 ## License
 
-MIT License - See [LICENSE](https://github.com/CoplayDev/unity-mcp/blob/main/LICENSE)
+MIT License - See [LICENSE](https://github.com/Zetkolink/unity-mcp/blob/main/LICENSE)

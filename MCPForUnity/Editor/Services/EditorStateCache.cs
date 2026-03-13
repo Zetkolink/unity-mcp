@@ -532,7 +532,7 @@ namespace MCPForUnity.Editor.Services
         /// <summary>
         /// Returns the actual compilation state, working around a known Unity quirk where
         /// EditorApplication.isCompiling can return false positives in Play mode.
-        /// See: https://github.com/CoplayDev/unity-mcp/issues/549
+        /// See: https://github.com/Zetkolink/unity-mcp/issues/549
         /// </summary>
         private static bool GetActualIsCompiling()
         {

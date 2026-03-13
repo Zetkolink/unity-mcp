@@ -11,7 +11,7 @@ Model Context Protocol server for Unity Editor integration. Control Unity throug
 
 💬 **Join our community:** [Discord Server](https://discord.gg/y4p8KfzrN4)
 
-**Required:** Install the [Unity MCP Plugin](https://github.com/CoplayDev/unity-mcp?tab=readme-ov-file#-step-1-install-the-unity-package) to connect Unity Editor with this MCP server. You also need `uvx` (requires [uv](https://docs.astral.sh/uv/)) to run the server.
+**Required:** Install the [Unity MCP Plugin](https://github.com/Zetkolink/unity-mcp?tab=readme-ov-file#-step-1-install-the-unity-package) to connect Unity Editor with this MCP server. You also need `uvx` (requires [uv](https://docs.astral.sh/uv/)) to run the server.
 
 ---
 
@@ -24,7 +24,7 @@ Install and run directly from PyPI using `uvx`.
 **Run Server (HTTP):**
 
 ```bash
-uvx --from mcpforunityserver mcp-for-unity --transport http --http-url http://localhost:8080
+uvx --from zetkolink-mcp-unity mcp-for-unity --transport http --http-url http://localhost:8080
 ```
 
 **MCP Client Configuration (HTTP):**
@@ -48,7 +48,7 @@ uvx --from mcpforunityserver mcp-for-unity --transport http --http-url http://lo
       "command": "uvx",
       "args": [
         "--from",
-        "mcpforunityserver",
+        "zetkolink-mcp-unity",
         "mcp-for-unity",
         "--transport",
         "stdio"
@@ -69,7 +69,7 @@ Use this to run the latest released version from the repository. Change the vers
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/CoplayDev/unity-mcp@v9.5.3#subdirectory=Server",
+        "git+https://github.com/Zetkolink/unity-mcp@v9.5.3#subdirectory=Server",
         "mcp-for-unity",
         "--transport",
         "stdio"
@@ -102,7 +102,7 @@ For contributing or modifying the server code:
 
 ```bash
 # Clone the repository
-git clone https://github.com/CoplayDev/unity-mcp.git
+git clone https://github.com/Zetkolink/unity-mcp.git
 cd unity-mcp/Server
 
 # Run with uv
@@ -169,19 +169,19 @@ Telemetry:
 **Stdio (default):**
 
 ```bash
-uvx --from mcpforunityserver mcp-for-unity --transport stdio
+uvx --from zetkolink-mcp-unity mcp-for-unity --transport stdio
 ```
 
 **HTTP (local):**
 
 ```bash
-uvx --from mcpforunityserver mcp-for-unity --transport http --http-host 127.0.0.1 --http-port 8080
+uvx --from zetkolink-mcp-unity mcp-for-unity --transport http --http-host 127.0.0.1 --http-port 8080
 ```
 
 **HTTP (remote-hosted with API key auth):**
 
 ```bash
-uvx --from mcpforunityserver mcp-for-unity \
+uvx --from zetkolink-mcp-unity mcp-for-unity \
   --transport http \
   --http-host 0.0.0.0 \
   --http-port 8080 \
@@ -193,7 +193,7 @@ uvx --from mcpforunityserver mcp-for-unity \
 **Disable telemetry:**
 
 ```bash
-DISABLE_TELEMETRY=1 uvx --from mcpforunityserver mcp-for-unity --transport stdio
+DISABLE_TELEMETRY=1 uvx --from zetkolink-mcp-unity mcp-for-unity --transport stdio
 ```
 
 ---
@@ -270,7 +270,7 @@ Once connected, try these commands in your AI assistant:
 
 For complete documentation, troubleshooting, and advanced usage:
 
-📖 **[Full Documentation](https://github.com/CoplayDev/unity-mcp#readme)**
+📖 **[Full Documentation](https://github.com/Zetkolink/unity-mcp#readme)**
 
 ---
 
@@ -284,4 +284,4 @@ For complete documentation, troubleshooting, and advanced usage:
 
 ## License
 
-MIT License - See [LICENSE](https://github.com/CoplayDev/unity-mcp/blob/main/LICENSE)
+MIT License - See [LICENSE](https://github.com/Zetkolink/unity-mcp/blob/main/LICENSE)

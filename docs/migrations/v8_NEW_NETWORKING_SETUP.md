@@ -125,7 +125,7 @@ This way, whenever a user updates the plugin, they will automatically point to t
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/7dff06679b89564ad92c88d8fe70c08e8efcbc22
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/7dff06679b89564ad92c88d8fe70c08e8efcbc22
 
 ### Upgrading configs from v7 to v8
 
@@ -135,7 +135,7 @@ So we added the `LegacyServerSrcMigration` class. It looks for the `MCPForUnity.
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/996ca48894a669344e3a7f3eff3d9e9913caec7d
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/996ca48894a669344e3a7f3eff3d9e9913caec7d
 
 ## Other changes
 
@@ -149,14 +149,14 @@ By using `uvx` and remote packages, we can safely offload all aspects of server 
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/64d64fde45af540229cf1995561cafc436bc3686
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/c830d56648710e4723a238a4692b7f85df4d4e42
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/85e934265c25b24cf44e4e758cb261fdb6eb333f
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/d217e2899e4b245ee25cb5f667dbb0be3dcf4948
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/50902b92f2f539b6292fec08e3fe9bedb91b2341
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/08b3d1893f003cc0c354079329879aa7b2ed8829
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/014f8c7db9c7b91054e177a64f30eb6bea3f9193
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/cad8c20faff9caf51bfc7772a40404f6fceeac33
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/64d64fde45af540229cf1995561cafc436bc3686
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/c830d56648710e4723a238a4692b7f85df4d4e42
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/85e934265c25b24cf44e4e758cb261fdb6eb333f
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/d217e2899e4b245ee25cb5f667dbb0be3dcf4948
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/50902b92f2f539b6292fec08e3fe9bedb91b2341
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/08b3d1893f003cc0c354079329879aa7b2ed8829
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/014f8c7db9c7b91054e177a64f30eb6bea3f9193
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/cad8c20faff9caf51bfc7772a40404f6fceeac33
 
 ### Asynchronous tools and resources
 
@@ -166,9 +166,9 @@ This was required for the HTTP server, because we cannot block the event loop wi
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/d5d738d83d96eabdc19e13bb650cd8fe578c58bc
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/8b4bcb65cdaf1bdefcb3828c170307de0588c18f
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/d6e2466b6869cc64ad8a358ec95d045830f37eff
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/d5d738d83d96eabdc19e13bb650cd8fe578c58bc
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/8b4bcb65cdaf1bdefcb3828c170307de0588c18f
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/d6e2466b6869cc64ad8a358ec95d045830f37eff
 
 ### Custom tools
 
@@ -195,20 +195,20 @@ To make tools local to the project, we add a `mcpforunity://custom-tools` resour
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/b4be06893ef218a84468dbc71b9dc8614289e433
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/77641dae64e8b3c572dd876af0b59ea454f04b0c
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/f968c8f446dff6fb0c70d033b148de934c6aebf3
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/ea754042b645a22cefb4f2fb820d1f4756af4ded
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/e9254c7776d7d948722b58805ee047499fc5a65b
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/662656b56a1b77c3f59116522e89c78b9b8af76f
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/cd88e86762cf82e0db8e687a2e64211c25b47b80
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/95c5265816aa7205588130f211f86e5e1e2d637b
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/85cd5c0cf47582bb43eab7ec998f4044a6430275
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/a84c2c29a08cabc3345e50147afa896ea4ae37bf
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/4f22d54ae38f84cfc05e50ad30675f4bb728f76d
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/01976a507396bf7fca1fd253172dd4c83ff33867
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/7525dfa547db5730cd911db25d2baa8bad969c71
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/53a397597df3fcaa4fa54188e9920348158c7425
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/b4be06893ef218a84468dbc71b9dc8614289e433
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/77641dae64e8b3c572dd876af0b59ea454f04b0c
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/f968c8f446dff6fb0c70d033b148de934c6aebf3
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/ea754042b645a22cefb4f2fb820d1f4756af4ded
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/e9254c7776d7d948722b58805ee047499fc5a65b
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/662656b56a1b77c3f59116522e89c78b9b8af76f
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/cd88e86762cf82e0db8e687a2e64211c25b47b80
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/95c5265816aa7205588130f211f86e5e1e2d637b
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/85cd5c0cf47582bb43eab7ec998f4044a6430275
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/a84c2c29a08cabc3345e50147afa896ea4ae37bf
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/4f22d54ae38f84cfc05e50ad30675f4bb728f76d
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/01976a507396bf7fca1fd253172dd4c83ff33867
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/7525dfa547db5730cd911db25d2baa8bad969c71
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/53a397597df3fcaa4fa54188e9920348158c7425
 
 ### Window logic has been split into separate classes
 
@@ -218,8 +218,8 @@ Each section has its own C#, uxml and uss files, but we use a common uss file fo
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/154b4ff3ad9c98f5f5ee8628cd8bcb79d0e108b5
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/1a9bb008a416a2b3abb0d91819a8173d362748b8
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/154b4ff3ad9c98f5f5ee8628cd8bcb79d0e108b5
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/1a9bb008a416a2b3abb0d91819a8173d362748b8
 
 #### Setup Wizard
 
@@ -227,8 +227,8 @@ The Setup Wizard also got revamped. For starters, it's no longer a wizard, just 
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/aa63f21ea42372853690618d928cd1fad73e7c25
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/cd4529c21f35e5be10a98dcf9303c210ebf42d2b
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/aa63f21ea42372853690618d928cd1fad73e7c25
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/cd4529c21f35e5be10a98dcf9303c210ebf42d2b
 
 ### Response classes
 
@@ -238,7 +238,7 @@ JSON serialization is the exact same, but it's clearer in the code what's being 
 
 Relevant commits:
 
-- https://github.com/CoplayDev/unity-mcp/pull/375/commits/f917d9489540498a908f514a561160c08d9d1023
+- https://github.com/Zetkolink/unity-mcp/pull/375/commits/f917d9489540498a908f514a561160c08d9d1023
 
 ### Miscellaneous
 

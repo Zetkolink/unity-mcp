@@ -75,7 +75,7 @@ fi
 
 shopt -s nullglob
 VERSION="$(python3 -c 'import tomllib, pathlib; p = pathlib.Path("'"$ROOT_DIR"'/Server/pyproject.toml"); print(tomllib.loads(p.read_text(encoding="utf-8"))["project"]["version"])')"
-FILES=("$DIST_DIR"/mcpforunityserver-"$VERSION"*)
+FILES=("$DIST_DIR"/zetkolink-mcp-unity-"$VERSION"*)
 shopt -u nullglob
 
 if (( ${#FILES[@]} == 0 )); then

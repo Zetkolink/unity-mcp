@@ -287,7 +287,7 @@ The service layer is designed to be reused by other parts of the codebase. For e
 
 ## Pull Request Reference
 
-**PR #313:** [feat: New UI with service architecture](https://github.com/CoplayDev/unity-mcp/pull/313)
+**PR #313:** [feat: New UI with service architecture](https://github.com/Zetkolink/unity-mcp/pull/313)
 
 **Key Commits:**
 - Service layer implementation

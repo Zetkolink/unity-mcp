@@ -1,6 +1,6 @@
 [project]
-name = "mcpforunityserver"
-version = "9.5.3"
+name = "zetkolink-mcp-unity"
+version = "9.5.4"
 description = "MCP for Unity Server: A Unity package for Unity Editor integration via the Model Context Protocol (MCP)."
 readme = "README.md"
 license = "MIT"
@@ -47,8 +47,8 @@ dev = [
 ]
 
 [project.urls]
-Repository = "https://github.com/CoplayDev/unity-mcp.git"
-Issues = "https://github.com/CoplayDev/unity-mcp/issues"
+Repository = "https://github.com/Zetkolink/unity-mcp.git"
+Issues = "https://github.com/Zetkolink/unity-mcp/issues"
 
 [project.scripts]
 mcp-for-unity = "main:main"

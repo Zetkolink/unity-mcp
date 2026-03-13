@@ -234,17 +234,17 @@ namespace MCPForUnity.Editor.Helpers
             if (version == "unknown")
             {
                 // Fall back to latest PyPI version so configs remain valid in test scenarios
-                return "mcpforunityserver";
+                return "zetkolink-mcp-unity";
             }
 
             // Package.json uses semver prerelease tags (e.g., 9.4.5-beta.1) that are not valid
             // PEP 440 pins for uvx. Use the beta prerelease range instead of a pinned prerelease.
             if (IsSemVerPreRelease(version))
             {
-                return "mcpforunityserver>=0.0.0a0";
+                return "zetkolink-mcp-unity>=0.0.0a0";
             }
 
-            return $"mcpforunityserver=={version}";
+            return $"zetkolink-mcp-unity=={version}";
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace MCPForUnity.Editor.Helpers
         /// For background threads, use the overload that accepts pre-captured parameters.
         /// </summary>
         /// <param name="quoteFromPath">Whether to quote the --from path (needed for command-line strings, not for arg lists)</param>
-        /// <returns>The package source arguments (e.g., "--prerelease explicit --from mcpforunityserver>=0.0.0a0")</returns>
+        /// <returns>The package source arguments (e.g., "--prerelease explicit --from zetkolink-mcp-unity>=0.0.0a0")</returns>
         public static string GetBetaServerFromArgs(bool quoteFromPath = false)
         {
             string gitUrlOverride = EditorPrefs.GetString(EditorPrefKeys.GitUrlOverride, "");
@@ -353,14 +353,14 @@ namespace MCPForUnity.Editor.Helpers
                 return $"--from {fromValue}";
             }
 
-            bool usePrereleaseRange = string.Equals(packageSource, "mcpforunityserver>=0.0.0a0", StringComparison.OrdinalIgnoreCase);
+            bool usePrereleaseRange = string.Equals(packageSource, "zetkolink-mcp-unity>=0.0.0a0", StringComparison.OrdinalIgnoreCase);
 
             // Prerelease package mode: use prerelease from PyPI.
             if (usePrereleaseRange)
             {
                 // Use --prerelease explicit with version specifier to only get prereleases of our package,
                 // not of dependencies (which can be broken on PyPI).
-                string fromValue = quoteFromPath ? "\"mcpforunityserver>=0.0.0a0\"" : "mcpforunityserver>=0.0.0a0";
+                string fromValue = quoteFromPath ? "\"zetkolink-mcp-unity>=0.0.0a0\"" : "zetkolink-mcp-unity>=0.0.0a0";
                 return $"--prerelease explicit --from {fromValue}";
             }
 
@@ -406,7 +406,7 @@ namespace MCPForUnity.Editor.Helpers
                 return args;
             }
 
-            bool usePrereleaseRange = string.Equals(packageSource, "mcpforunityserver>=0.0.0a0", StringComparison.OrdinalIgnoreCase);
+            bool usePrereleaseRange = string.Equals(packageSource, "zetkolink-mcp-unity>=0.0.0a0", StringComparison.OrdinalIgnoreCase);
 
             // Prerelease package mode: use prerelease from PyPI.
             if (usePrereleaseRange)
@@ -414,7 +414,7 @@ namespace MCPForUnity.Editor.Helpers
                 args.Add("--prerelease");
                 args.Add("explicit");
                 args.Add("--from");
-                args.Add("mcpforunityserver>=0.0.0a0");
+                args.Add("zetkolink-mcp-unity>=0.0.0a0");
                 return args;
             }
 

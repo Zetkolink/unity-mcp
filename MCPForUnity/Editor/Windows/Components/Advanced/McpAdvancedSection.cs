@@ -25,7 +25,7 @@ namespace MCPForUnity.Editor.Windows.Components.Advanced
         private Button browseGitUrlButton;
         private Button clearGitUrlButton;
         private Toggle autoStartOnLoadToggle;
-        private Toggle debugLogsToggle;
+        private DropdownField logLevelDropdown;
         private Toggle logRecordToggle;
         private Toggle devModeForceRefreshToggle;
         private Toggle allowLanHttpBindToggle;
@@ -68,7 +68,7 @@ namespace MCPForUnity.Editor.Windows.Components.Advanced
             browseGitUrlButton = Root.Q<Button>("browse-git-url-button");
             clearGitUrlButton = Root.Q<Button>("clear-git-url-button");
             autoStartOnLoadToggle = Root.Q<Toggle>("auto-start-on-load-toggle");
-            debugLogsToggle = Root.Q<Toggle>("debug-logs-toggle");
+            logLevelDropdown = Root.Q<DropdownField>("log-level-dropdown");
             logRecordToggle = Root.Q<Toggle>("log-record-toggle");
             devModeForceRefreshToggle = Root.Q<Toggle>("dev-mode-force-refresh-toggle");
             allowLanHttpBindToggle = Root.Q<Toggle>("allow-lan-http-bind-toggle");
@@ -93,12 +93,13 @@ namespace MCPForUnity.Editor.Windows.Components.Advanced
                 uvxPathOverride.tooltip = "Override path to uvx executable. Leave empty for auto-detection.";
             if (gitUrlOverride != null)
                 gitUrlOverride.tooltip = "Override server source for uvx --from. Leave empty to use default PyPI package. Example local dev: /path/to/unity-mcp/Server";
-            if (debugLogsToggle != null)
+            if (logLevelDropdown != null)
             {
-                debugLogsToggle.tooltip = "Enable verbose debug logging to the Unity Console.";
-                var debugLabel = debugLogsToggle?.parent?.Q<Label>();
-                if (debugLabel != null)
-                    debugLabel.tooltip = debugLogsToggle.tooltip;
+                logLevelDropdown.tooltip = "Set minimum log level shown in the Unity Console.";
+                logLevelDropdown.choices = new System.Collections.Generic.List<string> { "Error", "Warning", "Info", "Debug" };
+                var logLevelLabel = logLevelDropdown.parent?.Q<Label>();
+                if (logLevelLabel != null)
+                    logLevelLabel.tooltip = logLevelDropdown.tooltip;
             }
             if (logRecordToggle != null)
             {
@@ -162,9 +163,11 @@ namespace MCPForUnity.Editor.Windows.Components.Advanced
 
             gitUrlOverride.value = EditorPrefs.GetString(EditorPrefKeys.GitUrlOverride, "");
 
-            bool debugEnabled = EditorPrefs.GetBool(EditorPrefKeys.DebugLogs, false);
-            debugLogsToggle.value = debugEnabled;
-            McpLog.SetDebugLoggingEnabled(debugEnabled);
+            if (logLevelDropdown != null)
+            {
+                var currentLevel = McpLog.GetLogLevel();
+                logLevelDropdown.SetValueWithoutNotify(currentLevel.ToString());
+            }
 
             if (logRecordToggle != null)
                 logRecordToggle.value = McpLogRecord.IsEnabled;
@@ -217,10 +220,14 @@ namespace MCPForUnity.Editor.Windows.Components.Advanced
                 OnHttpServerCommandUpdateRequested?.Invoke();
             };
 
-            debugLogsToggle.RegisterValueChangedCallback(evt =>
+            if (logLevelDropdown != null)
             {
-                McpLog.SetDebugLoggingEnabled(evt.newValue);
-            });
+                logLevelDropdown.RegisterValueChangedCallback(evt =>
+                {
+                    if (Enum.TryParse<McpLogLevel>(evt.newValue, out var level))
+                        McpLog.SetLogLevel(level);
+                });
+            }
 
             if (logRecordToggle != null)
             {
@@ -364,7 +371,8 @@ namespace MCPForUnity.Editor.Windows.Components.Advanced
             gitUrlOverride.value = EditorPrefs.GetString(EditorPrefKeys.GitUrlOverride, "");
             if (autoStartOnLoadToggle != null)
                 autoStartOnLoadToggle.value = EditorPrefs.GetBool(EditorPrefKeys.AutoStartOnLoad, false);
-            debugLogsToggle.value = EditorPrefs.GetBool(EditorPrefKeys.DebugLogs, false);
+            if (logLevelDropdown != null)
+                logLevelDropdown.SetValueWithoutNotify(McpLog.GetLogLevel().ToString());
             if (logRecordToggle != null)
                 logRecordToggle.value = McpLogRecord.IsEnabled;
             devModeForceRefreshToggle.value = EditorPrefs.GetBool(EditorPrefKeys.DevModeForceServerRefresh, false);

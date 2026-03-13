@@ -10,7 +10,7 @@ namespace MCPForUnityTests.Editor.Helpers
     /// <summary>
     /// Tests for Matrix4x4Converter to ensure it safely serializes matrices
     /// without accessing dangerous computed properties (lossyScale, rotation).
-    /// Regression test for https://github.com/CoplayDev/unity-mcp/issues/478
+    /// Regression test for https://github.com/Zetkolink/unity-mcp/issues/478
     /// </summary>
     public class Matrix4x4ConverterTests
     {

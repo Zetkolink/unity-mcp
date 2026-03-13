@@ -106,12 +106,12 @@ In Unity: `Window > Package Manager > + > Add package from git URL...`
 
 > [!TIP]
 > ```text
-> https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main
+> https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#main
 > ```
 
 **Want the latest beta?** Use the beta branch:
 ```text
-https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta
+https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#beta
 ```
 
 <details>
@@ -194,7 +194,7 @@ If auto-setup doesn't work, add this to your MCP client's config file:
   "mcpServers": {
     "unityMCP": {
       "command": "uvx",
-      "args": ["--from", "mcpforunityserver", "mcp-for-unity", "--transport", "stdio"]
+      "args": ["--from", "zetkolink-mcp-unity", "mcp-for-unity", "--transport", "stdio"]
     }
   }
 }
@@ -206,7 +206,7 @@ If auto-setup doesn't work, add this to your MCP client's config file:
   "mcpServers": {
     "unityMCP": {
       "command": "C:/Users/YOUR_USERNAME/AppData/Local/Microsoft/WinGet/Links/uvx.exe",
-      "args": ["--from", "mcpforunityserver", "mcp-for-unity", "--transport", "stdio"]
+      "args": ["--from", "zetkolink-mcp-unity", "mcp-for-unity", "--transport", "stdio"]
     }
   }
 }
@@ -262,11 +262,11 @@ For **Strict** validation that catches undefined namespaces, types, and methods:
 * **Client Not Connecting:** Ensure the HTTP server is running and the URL matches your config
 
 **Detailed setup guides:**
-* [Fix Unity MCP and Cursor, VSCode & Windsurf](https://github.com/CoplayDev/unity-mcp/wiki/1.-Fix-Unity-MCP-and-Cursor,-VSCode-&-Windsurf) — uv/Python installation, PATH issues
-* [Fix Unity MCP and Claude Code](https://github.com/CoplayDev/unity-mcp/wiki/2.-Fix-Unity-MCP-and-Claude-Code) — Claude CLI installation
-* [Common Setup Problems](https://github.com/CoplayDev/unity-mcp/wiki/3.-Common-Setup-Problems) — macOS dyld errors, FAQ
+* [Fix Unity MCP and Cursor, VSCode & Windsurf](https://github.com/Zetkolink/unity-mcp/wiki/1.-Fix-Unity-MCP-and-Cursor,-VSCode-&-Windsurf) — uv/Python installation, PATH issues
+* [Fix Unity MCP and Claude Code](https://github.com/Zetkolink/unity-mcp/wiki/2.-Fix-Unity-MCP-and-Claude-Code) — Claude CLI installation
+* [Common Setup Problems](https://github.com/Zetkolink/unity-mcp/wiki/3.-Common-Setup-Problems) — macOS dyld errors, FAQ
 
-Still stuck? [Open an Issue](https://github.com/CoplayDev/unity-mcp/issues) or [Join Discord](https://discord.gg/y4p8KfzrN4)
+Still stuck? [Open an Issue](https://github.com/Zetkolink/unity-mcp/issues) or [Join Discord](https://discord.gg/y4p8KfzrN4)
 </details>
 
 <details>
@@ -295,13 +295,13 @@ Network defaults are intentionally fail-closed:
 
 ---
 
-**License:** MIT — See [LICENSE](LICENSE) | **Need help?** [Discord](https://discord.gg/y4p8KfzrN4) | [Issues](https://github.com/CoplayDev/unity-mcp/issues)
+**License:** MIT — See [LICENSE](LICENSE) | **Need help?** [Discord](https://discord.gg/y4p8KfzrN4) | [Issues](https://github.com/Zetkolink/unity-mcp/issues)
 
 ---
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=CoplayDev/unity-mcp&type=Date)](https://www.star-history.com/#CoplayDev/unity-mcp&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Zetkolink/unity-mcp&type=Date)](https://www.star-history.com/#Zetkolink/unity-mcp&Date)
 
 <details>
 <summary><strong>Citation for Research</strong></summary>

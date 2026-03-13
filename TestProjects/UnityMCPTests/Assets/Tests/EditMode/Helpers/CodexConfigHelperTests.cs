@@ -14,7 +14,7 @@ namespace MCPForUnityTests.Editor.Helpers
     {
         /// <summary>
         /// Validates that a TOML args array contains the expected uvx structure:
-        /// --from, a mcpforunityserver reference, mcp-for-unity package name,
+        /// --from, a zetkolink-mcp-unity reference, mcp-for-unity package name,
         /// and optionally --prerelease/explicit (only for prerelease builds).
         /// </summary>
         private static void AssertValidUvxArgs(TomlArray args)
@@ -24,7 +24,7 @@ namespace MCPForUnityTests.Editor.Helpers
                 argValues.Add((child as TomlString).Value);
 
             Assert.IsTrue(argValues.Contains("--from"), "Args should contain --from");
-            Assert.IsTrue(argValues.Any(a => a.Contains("mcpforunityserver")), "Args should contain PyPI package reference");
+            Assert.IsTrue(argValues.Any(a => a.Contains("zetkolink-mcp-unity")), "Args should contain PyPI package reference");
             Assert.IsTrue(argValues.Contains("mcp-for-unity"), "Args should contain package name");
 
             // Prerelease builds include --prerelease explicit before --from
@@ -146,14 +146,14 @@ namespace MCPForUnityTests.Editor.Helpers
             string toml = string.Join("\n", new[]
             {
                 "[mcp_servers.unityMCP]",
-                "command = \"uvx --from git+https://github.com/CoplayDev/unity-mcp@v6.3.0#subdirectory=Server\"",
+                "command = \"uvx --from git+https://github.com/Zetkolink/unity-mcp@v6.3.0#subdirectory=Server\"",
                 "args = [\"mcp-for-unity\"]"
             });
 
             bool result = CodexConfigHelper.TryParseCodexServer(toml, out string command, out string[] args);
 
             Assert.IsTrue(result, "Parser should detect server definition");
-            Assert.AreEqual("uvx --from git+https://github.com/CoplayDev/unity-mcp@v6.3.0#subdirectory=Server", command);
+            Assert.AreEqual("uvx --from git+https://github.com/Zetkolink/unity-mcp@v6.3.0#subdirectory=Server", command);
             CollectionAssert.AreEqual(new[] { "mcp-for-unity" }, args);
         }
 
@@ -338,7 +338,7 @@ namespace MCPForUnityTests.Editor.Helpers
         [Test]
         public void UpsertCodexServerBlock_OnWindows_IncludesSystemRootEnv()
         {
-            // This test verifies the fix for https://github.com/CoplayDev/unity-mcp/issues/315
+            // This test verifies the fix for https://github.com/Zetkolink/unity-mcp/issues/315
             // Ensures that upsert operations also include Windows-specific env configuration in stdio mode
 
             // Force stdio mode

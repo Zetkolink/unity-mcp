@@ -9,7 +9,7 @@ on:
 
 jobs:
   j1:
-    if: github.repository == 'CoplayDev/unity-mcp'
+    if: github.repository == 'Zetkolink/unity-mcp'
     name: github-repo-stats
     runs-on: ubuntu-latest
     steps:

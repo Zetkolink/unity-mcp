@@ -9,11 +9,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/CoplayDev/unity-mcp"
+    "url": "https://github.com/Zetkolink/unity-mcp"
   },
   "homepage": "https://www.coplay.dev",
-  "documentation": "https://github.com/CoplayDev/unity-mcp#readme",
-  "support": "https://github.com/CoplayDev/unity-mcp/issues",
+  "documentation": "https://github.com/Zetkolink/unity-mcp#readme",
+  "support": "https://github.com/Zetkolink/unity-mcp/issues",
   "icon": "coplay-logo.png",
   "server": {
     "type": "python",
@@ -22,7 +22,7 @@
       "command": "uvx",
       "args": [
         "--from",
-        "mcpforunityserver",
+        "zetkolink-mcp-unity",
         "mcp-for-unity"
       ],
       "env": {}

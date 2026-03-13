@@ -51,12 +51,12 @@
 
 > [!TIP]
 > ```text
-> https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main
+> https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#main
 > ```
 
 **想要最新的 beta 版本？** 使用 beta 分支：
 ```text
-https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta
+https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#beta
 ```
 
 <details>
@@ -139,7 +139,7 @@ openupm add com.coplaydev.unity-mcp
   "mcpServers": {
     "unityMCP": {
       "command": "uvx",
-      "args": ["--from", "mcpforunityserver", "mcp-for-unity", "--transport", "stdio"]
+      "args": ["--from", "zetkolink-mcp-unity", "mcp-for-unity", "--transport", "stdio"]
     }
   }
 }
@@ -151,7 +151,7 @@ openupm add com.coplaydev.unity-mcp
   "mcpServers": {
     "unityMCP": {
       "command": "C:/Users/YOUR_USERNAME/AppData/Local/Microsoft/WinGet/Links/uvx.exe",
-      "args": ["--from", "mcpforunityserver", "mcp-for-unity", "--transport", "stdio"]
+      "args": ["--from", "zetkolink-mcp-unity", "mcp-for-unity", "--transport", "stdio"]
     }
   }
 }
@@ -199,11 +199,11 @@ MCP for Unity 支持多个 Unity Editor 实例。要将操作定向到某个特�
 * **Client 无法连接：** 确认 HTTP server 正在运行，并且 URL 与你的配置一致
 
 **详细的设置指南：**
-* [Fix Unity MCP and Cursor, VSCode & Windsurf](https://github.com/CoplayDev/unity-mcp/wiki/1.-Fix-Unity-MCP-and-Cursor,-VSCode-&-Windsurf) — uv/Python 安装、PATH 问题
-* [Fix Unity MCP and Claude Code](https://github.com/CoplayDev/unity-mcp/wiki/2.-Fix-Unity-MCP-and-Claude-Code) — Claude CLI 安装
-* [Common Setup Problems](https://github.com/CoplayDev/unity-mcp/wiki/3.-Common-Setup-Problems) — macOS dyld 错误、FAQ
+* [Fix Unity MCP and Cursor, VSCode & Windsurf](https://github.com/Zetkolink/unity-mcp/wiki/1.-Fix-Unity-MCP-and-Cursor,-VSCode-&-Windsurf) — uv/Python 安装、PATH 问题
+* [Fix Unity MCP and Claude Code](https://github.com/Zetkolink/unity-mcp/wiki/2.-Fix-Unity-MCP-and-Claude-Code) — Claude CLI 安装
+* [Common Setup Problems](https://github.com/Zetkolink/unity-mcp/wiki/3.-Common-Setup-Problems) — macOS dyld 错误、FAQ
 
-还是卡住？[开一个 Issue](https://github.com/CoplayDev/unity-mcp/issues) 或 [加入 Discord](https://discord.gg/y4p8KfzrN4)
+还是卡住？[开一个 Issue](https://github.com/Zetkolink/unity-mcp/issues) 或 [加入 Discord](https://discord.gg/y4p8KfzrN4)
 </details>
 
 <details>
@@ -222,13 +222,13 @@ MCP for Unity 支持多个 Unity Editor 实例。要将操作定向到某个特�
 
 ---
 
-**许可证：** MIT — 查看 [LICENSE](../../LICENSE) | **需要帮助？** [Discord](https://discord.gg/y4p8KfzrN4) | [Issues](https://github.com/CoplayDev/unity-mcp/issues)
+**许可证：** MIT — 查看 [LICENSE](../../LICENSE) | **需要帮助？** [Discord](https://discord.gg/y4p8KfzrN4) | [Issues](https://github.com/Zetkolink/unity-mcp/issues)
 
 ---
 
 ## Star 历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=CoplayDev/unity-mcp&type=Date)](https://www.star-history.com/#CoplayDev/unity-mcp&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Zetkolink/unity-mcp&type=Date)](https://www.star-history.com/#Zetkolink/unity-mcp&Date)
 
 <details>
 <summary><strong>研究引用</strong></summary>

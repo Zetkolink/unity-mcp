@@ -29,8 +29,8 @@ python mcp_source.py
 ```
 
 选项：
-1. **Upstream main** - 稳定版本 (CoplayDev/unity-mcp)
-2. **Upstream beta** - 开发分支 (CoplayDev/unity-mcp#beta)
+1. **Upstream main** - 稳定版本 (Zetkolink/unity-mcp)
+2. **Upstream beta** - 开发分支 (Zetkolink/unity-mcp#beta)
 3. **Remote branch** - 你的 fork 当前分支
 4. **Local workspace** - 指向本地 MCPForUnity 文件夹的 file: URL
 

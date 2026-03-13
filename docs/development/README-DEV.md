@@ -29,8 +29,8 @@ python mcp_source.py
 ```
 
 Options:
-1. **Upstream main** - stable release (CoplayDev/unity-mcp)
-2. **Upstream beta** - development branch (CoplayDev/unity-mcp#beta)
+1. **Upstream main** - stable release (Zetkolink/unity-mcp)
+2. **Upstream beta** - development branch (Zetkolink/unity-mcp#beta)
 3. **Remote branch** - your fork's current branch
 4. **Local workspace** - file: URL to your local MCPForUnity folder
 

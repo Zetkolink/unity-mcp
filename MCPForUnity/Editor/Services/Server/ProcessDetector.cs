@@ -200,7 +200,7 @@ namespace MCPForUnity.Editor.Services.Server
                         bool mentionsMcp = wmicCompact.Contains("mcp-for-unity")
                                            || wmicCompact.Contains("mcp_for_unity")
                                            || wmicCompact.Contains("mcpforunity")
-                                           || wmicCompact.Contains("mcpforunityserver");
+                                           || wmicCompact.Contains("zetkolink-mcp-unity");
                         bool mentionsTransport = wmicCompact.Contains("--transporthttp") || (wmicCompact.Contains("--transport") && wmicCompact.Contains("http"));
                         bool mentionsUvicorn = wmicCombined.Contains("uvicorn");
 

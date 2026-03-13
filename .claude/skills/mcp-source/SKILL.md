@@ -58,8 +58,8 @@ Based on the user's selection, construct the dependency value:
 
 | Selection | URL |
 |-----------|-----|
-| `main`    | `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main` |
-| `beta`    | `https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta` |
+| `main`    | `https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#main` |
+| `beta`    | `https://github.com/Zetkolink/unity-mcp.git?path=/MCPForUnity#beta` |
 | `branch`  | `{origin_https}?path=/MCPForUnity#{branch_name}` |
 | `local`   | `file:{repo_root}/MCPForUnity` |
 

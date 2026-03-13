@@ -23,8 +23,8 @@
             </ui:VisualElement>
 
             <ui:VisualElement class="setting-row" style="margin-top: 8px;">
-                <ui:Label text="Debug Logging:" class="setting-label" />
-                <ui:Toggle name="debug-logs-toggle" class="setting-toggle" />
+                <ui:Label text="Log Level:" class="setting-label" />
+                <ui:DropdownField name="log-level-dropdown" class="setting-toggle" />
             </ui:VisualElement>
 
             <ui:VisualElement class="setting-row">

@@ -135,7 +135,7 @@ else:
 ## 🤝 Contact & Transparency
 
 - **Questions**: [Discord Community](https://discord.gg/y4p8KfzrN4)
-- **Issues**: [GitHub Issues](https://github.com/CoplayDev/unity-mcp/issues)
+- **Issues**: [GitHub Issues](https://github.com/Zetkolink/unity-mcp/issues)
 - **Privacy Concerns**: Create a GitHub issue with "Privacy" label
 - **Source Code**: All telemetry code is open source in this repository
 
