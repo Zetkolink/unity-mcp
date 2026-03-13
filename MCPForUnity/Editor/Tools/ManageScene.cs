@@ -1649,7 +1649,8 @@ namespace MCPForUnity.Editor.Tools
                     return new SuccessResponse($"SubScene '{sceneName}' is already open.");
 
                 // Open the SubScene for editing
-                SubScene.SetOpenForEdit(new[] { sub }, true);
+                sub.AutoLoadScene = true;
+                EditorSceneManager.OpenScene(sub.EditableScenePath, OpenSceneMode.Additive);
 
                 return new SuccessResponse(
                     $"Opened SubScene '{sceneName}' for editing.",
@@ -1684,7 +1685,9 @@ namespace MCPForUnity.Editor.Tools
                 if (!sub.IsLoaded)
                     return new SuccessResponse($"SubScene '{sceneName}' is already closed.");
 
-                SubScene.SetOpenForEdit(new[] { sub }, false);
+                sub.AutoLoadScene = false;
+                if (sub.EditingScene.isLoaded)
+                    EditorSceneManager.CloseScene(sub.EditingScene, true);
 
                 return new SuccessResponse(
                     $"Closed SubScene '{sceneName}'.",
